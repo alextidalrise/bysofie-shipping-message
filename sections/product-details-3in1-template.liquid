@@ -162,7 +162,7 @@
 
           {% comment %} Tidal Rise CID 1 - End of customisation {% endcomment %}
           <span class="sold-separately">*Please note play mats and hanging toys sold separately</span>
-          
+
 {% unless collection_handles contains 'coming-soon' %}
             {% render 'product-form',
                     product: product,
@@ -171,19 +171,10 @@
             %}
           {% endunless %}
           
-          <div class="shipping-notice">
-              <span id="uk-shipping-notice" class="is-hidden">
-                  {{settings.uk_shipping_notice | split: 'shipping tab' | first }}
-                  <a href="javascript:void(0)" id="shipping-link"> shipping tab </a>
-                  {{settings.uk_shipping_notice | split: 'shipping tab' | last }}
-              </span>
-              <span id="non-uk-shipping-notice" class="is-hidden">
-                  {{settings.non_uk_shipping_notice | split: 'shipping tab' | first }}
-                  <a href="javascript:void(0)" id="shipping-link"> shipping tab </a>
-                  {{settings.non_uk_shipping_notice | split: 'shipping tab' | last }}
-              </span>
-          </div>
-          
+          {% unless collection_handles contains 'coming-soon' or collection_handles contains 'pre-order' or product.available == false %}
+            {% render 'shipping-notice' %}
+          {% endunless %}
+
           <div id="cbb-frequently-bought-box"></div>
 
           {% if section.settings.product_description_position == "bottom" %}
