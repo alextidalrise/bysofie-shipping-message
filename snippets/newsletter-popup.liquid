@@ -1,0 +1,39 @@
+<div class="js-newsletter-popup {% if settings.newsletter_bg %} newsletter-popup__has-background-image {% endif %} {% if settings.newsletter_bg_stretched %} newsletter-popup__has-background-stretched {% endif %}">
+  <div class="newsletter-popup__content">
+  <a id="newsletter" href="#target"></a>
+    <span id="target">
+    {% if settings.newsletter_popup_link != blank %}
+      <a href="{{ settings.newsletter_popup_link }}">
+    {% endif %}
+
+    {% if settings.newsletter_popup_title != blank %}
+      <p class="headline">
+        {{ settings.newsletter_popup_title | escape }}
+      </p>
+    {% endif %}
+
+    {% if settings.newsletter_popup_image %}
+      <p>
+        {{ settings.newsletter_popup_image | img_url: '580x', scale: 2 | img_tag: settings.newsletter_popup_image.alt, 'lazyload transition-in' }}
+      </p>
+    {% endif %}
+
+    {% if settings.newsletter_popup_text != blank %}
+      {{ settings.newsletter_popup_text }}
+    {% endif %}
+
+    {% if settings.newsletter_popup_link != blank %}
+      </a>
+    {% endif %}
+
+    {% if settings.newsletter_popup_form %}
+      {% render 'newsletter',
+              context: 'modal',
+              first_name: settings.display_first_name,
+              last_name: settings.display_last_name
+       %}
+    {% endif %}
+    </span>
+  </div>
+</div>
+

@@ -1,0 +1,51 @@
+{%- assign product_found = false -%}
+{%- assign skip = false -%}
+
+{% unless template contains 'product' %}
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": [
+        {% for product in products limit: limit %}
+          {
+            "@type": "ListItem",
+            "position": "{{ forloop.index | json }}",
+            "url": "{{ shop.url }}{{ product.url }}",
+            "name": "{{ product.title | escape }}"
+          } {%- unless forloop.last -%},{%- endunless -%}
+        {% endfor %}
+      ]
+    }
+  </script>
+{% endunless %}
+
+{% for product in products limit: limit %}
+  {% if product.id == skip_product.id or skip == true %}
+    {%- assign product_found = true -%}
+  {% else %}
+    {% if forloop.rindex0 == 0 and product_found == false and forloop.length != products.size and template != 'search' and template != 'index' and template != 'page.details' %}
+      {%- assign skip = true -%}
+    {% else %}
+      {% if collection_style == 'list' %}
+        {% render 'product-thumbnail-list',
+                product: product,
+                object: object,
+                products_per_row: products_per_row,
+                sidebar: sidebar,
+                collection_style: collection_style,
+                image_crop: image_crop,
+                show_product_description: show_product_description,
+                truncated_words: truncated_words
+        %}
+      {% else %}
+        {% render 'product-thumbnail',
+                product: product,
+                object: object,
+                products_per_row: products_per_row,
+                sidebar: sidebar
+        %}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+{% endfor %}

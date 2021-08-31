@@ -1,0 +1,99 @@
+{% comment %}
+** Contact form - dynamic **
+- Draggable section
+{% endcomment %}
+
+{% comment %} Assign object as block or section {% endcomment %}
+{% if type == 'block' %}
+  {%- assign object = block -%}
+{% else %}
+  {%- assign object = section -%}
+{% endif %}
+
+{% comment %} Content settings {% endcomment %}
+{%- assign title = object.settings.title | escape -%}
+{%- assign contact_subheading = object.settings.contact_subheading | escape -%}
+{%- assign contact_content = object.settings.contact_content -%}
+{% comment %} End content settings {% endcomment %}
+
+<section class="section">
+  <div class="container contact_form one-whole column contact_form_position--{{ object.settings.contact_form_position }} contact_text_alignment--{{ object.settings.contact_text_alignment }}">
+    {% if title != blank %}
+      <div class="one-whole column">
+        <h2 class="title center">
+          {{ title }}
+        </h2>
+        <div class="feature_divider"></div>
+      </div>
+    {% endif %}
+
+    <div class="one-half medium-down--one-whole column">
+      <div class="one-whole column contact_content">
+        {% if contact_subheading != blank %}
+          <h3>{{ contact_subheading }}</h3>
+        {% endif %}
+
+        {% if contact_content != blank %}
+          {{ contact_content }}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="one-half medium-down--one-whole column">
+
+      {% form 'contact' %}
+      <div class="container">
+        <div class="one-whole column">
+          {% if form.posted_successfully? %}
+            <p class="quote">
+              {{ 'contact.form.post_success' | t }}
+            </p>
+          {% endif %}
+
+          {% if form.errors %}
+            <p class="quote">
+              {{ 'general.forms.post_error' | t }}
+            </p>
+
+            {%- assign message = 'contact.form.message' | t -%}
+
+            <ul class="center">
+              {% for field in form.errors %}
+                {% if field == 'form' %}
+                  <li>{{ form.errors.messages[field] }}</li>
+                {% else %}
+                  {%- assign field_name = field | replace: 'body', message -%}
+                  <li>{{ 'general.forms.post_field_error_html' | t: field: field_name, error: form.errors.messages[field] }}</li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+
+        <div class="one-half column">
+          {%- assign name_attr = 'contact.form.name' | handle -%}
+
+          <label for="contactFormName">{{ 'contact.form.name' | t }} <span class="red">*</span></label>
+
+          <input type="text" id="contactFormName" name="contact[{{ name_attr }}]" placeholder="{{ 'contact.form.name' | t }}" autocapitalize="words" value="{% if form[name_attr] %}{{ form[name_attr] }}{% elsif customer %}{{ customer.name }}{% endif %}" required="required">
+        </div>
+
+        <div class="one-half column">
+          <label for="contactFormEmail">{{ 'contact.form.email' | t }} <span class="red">*</span></label>
+
+          <input type="email" id="contactFormEmail" name="contact[email]" placeholder="{{ 'contact.form.email' | t }}" autocorrect="off" autocapitalize="off" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}" required="required">
+        </div>
+
+        <div class="one-whole column">
+          <label for="contactFormMessage">{{ 'contact.form.message' | t }} <span class="red">*</span></label>
+
+          <textarea rows="5" id="contactFormMessage" name="contact[body]" placeholder="{{ 'contact.form.message' | t }}" required="required">{% if form.body %}{{ form.body }}{% endif %}</textarea>
+
+          <input type="submit" class="submit action_button" value="{{ 'contact.form.send' | t }}" />
+        </div>
+      </div>
+      {% endform %}
+
+    </div>
+  </div>
+</section>

@@ -1,0 +1,31 @@
+{% comment %}
+** Page - dynamic **
+- Draggable section
+{% endcomment %}
+
+{% comment %} Assign object as block or section {% endcomment %}
+{% if type == 'block' %}
+  {%- assign object = block -%}
+{% else %}
+  {%- assign object = section -%}
+{% endif %}
+
+{% comment %} Content settings {% endcomment %}
+{%- assign content_page = object.settings.content_page -%}
+{% comment %} End content settings {% endcomment %}
+
+<section class="section">
+  <div class="container">
+    {% if content_page != blank %}
+      {% render 'page-multi-column', content: pages[content_page].content %}
+    {% else %}
+      <div class="one-whole column">
+        <div class="trim-last-paragraph">
+          <p class="center">
+            {{ 'homepage.onboarding.no_content' | t }}
+          </p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>

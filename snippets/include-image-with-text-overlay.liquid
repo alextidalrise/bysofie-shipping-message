@@ -1,0 +1,125 @@
+{% comment %}
+** Image with text overlay - dynamic **
+- Draggable section
+{% endcomment %}
+
+{% comment %} Assign object as block or section {% endcomment %}
+{% if type == 'block' %}
+  {%- assign object = block -%}
+{% else %}
+  {%- assign object = section -%}
+{% endif %}
+
+{% comment %} Content settings {% endcomment %}
+{%- assign image = object.settings.image -%}
+{%- assign subtitle = object.settings.subtitle -%}
+{%- assign title = object.settings.title -%}
+{%- assign button_label = object.settings.button_label -%}
+{%- assign link = object.settings.link -%}
+{%- assign text_position = object.settings.text_position | split: ' ' -%}
+{%- assign banner_css = object.settings.banner_css_class -%}
+{% comment %} End content settings {% endcomment %}
+
+{% capture banner_text %}
+  <div class="container banner__text text-align--{{ text_position[0] }}">
+    {% if link != blank and button_label == blank %}
+      <a href="{{ link }}" class="full-link">{{ link }}</a>
+    {% endif %}
+
+    <div class="{% if template == "index" or page.handle == "our-story" %}{{ banner_css }} {% endif %}banner__inner-text {{ object.settings.headline_animation }}">
+      {% if title != blank %}
+        <h1 class="headline">{{ title | escape }}</h1>
+      {% endif %}
+
+      {% if subtitle != blank %}
+        <div class="subtitle">{{ subtitle }}</div>
+      {% endif %}
+
+      {% if button_label != blank %}
+        <a {% if link != blank %}href="{{ link }}"{% endif %} class="action_button">
+          {{ button_label | escape }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if object.settings.homepage_arrow %}
+    <a href="#banner-{{ object.id }}-content" class="scroll-arrow">
+      <span class="icon-arrow-down"></span>
+    </a>
+  {% endif %}
+{% endcapture %}
+
+<section class="section is-width-wide has-no-side-gutter">
+  <div id="banner-{{ object.id }}" class="{%if page.handle == 'our-story' %}darken-image-true {% endif %} mobile-parallax-enabled--{{ settings.enable_mobile_parallax }} mobile-image-crop-enabled--{{ settings.slideshow_images_crop }}">
+    {% if object.settings.parallax_effect %}
+      <div class="parallax__wrap horizontal-text-position--{{ text_position[0] }} vertical-text-position--{{ text_position[1] }}">
+        {{ banner_text }}
+        <div class="parallax parallax-repeat"
+          {% if image != blank %}
+            data-parallax-image="{{ image | img_url: '2048x' }}"
+          {% else %}
+            style="background-image:url({{ 'placeholder.svg' | asset_url }})"
+          {% endif %}>
+          <noscript>
+            <img src="{{ image | img_url: '2000x' }}" alt="{{ image.alt | escape }}" class="image__fallback">
+          </noscript>
+        </div>
+        <img alt
+          class="mobile-placeholder-svg"
+          src="data:image/svg+xml;utf8,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='{{ image.width }}'%20height='{{ image.height }}'></svg>"/>
+      </div>
+    {% else %}
+      <div class="banner__wrap">
+        <div class="banner horizontal-text-position--{{ text_position[0] }} vertical-text-position--{{ text_position[1] }}">
+          {{ banner_text }}
+        </div>
+        {% if image != blank %}
+          <div class="banner__image-wrapper">
+            {% render 'image-element',
+                    image: image,
+                    alt: image.alt,
+                    stretch_width: true
+            %}
+          </div>
+        {% else %}
+          <img src="{{ 'placeholder.svg' | asset_url }}"/>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+  <a name="banner-{{ object.id }}-content" id="banner-{{ object.id }}-content"></a>
+</section>
+
+<style>
+  {% if object.settings.parallax_effect %}
+    #banner-{{ object.id }} .parallax__wrap,
+    #banner-{{ object.id }} .parallax__container .parallax {
+      height: {{ object.settings.parallax_image_height }}px;
+    }
+  {% endif %}
+
+  #banner-{{ object.id }} .parallax__container .parallax {
+    background-position: {{ object.settings.image_focal_point}} !important;
+  }
+
+  #banner-{{ object.id }} .banner__wrap img {
+    object-position: {{ object.settings.image_focal_point }};
+    -o-object-position: {{ object.settings.image_focal_point }};
+  }
+
+  @media only screen and (max-width: 798px) {
+    {% if settings.slideshow_images_crop or object.settings.parallax_effect and settings.enable_mobile_parallax %}
+      #banner-{{ object.id }} .banner__wrap,
+      #banner-{{ object.id }} .parallax__wrap,
+      #banner-{{ object.id }} .parallax__container .parallax {
+        height: {{ object.settings.parallax_image_height | divided_by: 2 }}px;
+      }
+    {% else %}
+      #banner-{{ object.id }} .banner__wrap,
+      #banner-{{ object.id }} .parallax__wrap {
+        height: auto;
+      }
+    {% endif %}
+  }
+</style>

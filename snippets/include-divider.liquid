@@ -1,0 +1,32 @@
+{% comment %}
+** Divider - dynamic **
+- Draggable section
+{% endcomment %}
+
+{% comment %} Assign object as block or section {% endcomment %}
+{% if type == 'block' %}
+  {%- assign object = block -%}
+{% else %}
+  {%- assign object = section -%}
+{% endif %}
+
+{% comment %} Content settings {% endcomment %}
+{%- assign divider_border = object.settings.divider_border -%}
+{%- assign divider_spacing = object.settings.divider_spacing -%}
+{% comment %} End content settings {% endcomment %}
+
+<section class="section">
+  <div class="container">
+    <div class="one-whole column">
+      <hr class="divider divider--{{ divider_border }}">
+    </div>
+  </div>
+</section>
+
+<style>
+  #block__{{ object.id }},
+  #shopify-section-{{ object.id }} {
+    margin-top: {{ divider_spacing }}px;
+    margin-bottom: {{ divider_spacing }}px;
+  }
+</style>

@@ -1,0 +1,108 @@
+{% comment %}
+** Featured collection - dynamic **
+- Draggable section
+{% endcomment %}
+
+{% comment %} Assign object as block or section {% endcomment %}
+{% if type == 'block' %}
+  {%- assign object = block -%}
+{% else %}
+  {%- assign object = section -%}
+{% endif %}
+
+{% comment %} Content settings {% endcomment %}
+{%- assign title = object.settings.title | escape -%}
+{%- assign collection = collections[object.settings.frontpage_collection] -%}
+{% comment %} End content settings {% endcomment %}
+
+<section class="section">
+  <div class="container">
+    {% if title != blank %}
+      <div class="one-whole column">
+        <h2 class="title">
+          <a href="{{ collection.url }}">
+            {{ title }}
+          </a>
+        </h2>
+        <div class="feature_divider"></div>
+      </div>
+    {% endif %}
+
+    {% if collection.description != blank %}
+      <div class="one-whole column">
+        {{ collection.description }}
+      </div>
+    {% endif %}
+
+    {% if collection.products.size > 0 %}
+      {% render 'product-loop',
+              limit: object.settings.frontpage_products_limit,
+              object: object,
+              products: collection.products,
+              products_per_row: object.settings.frontpage_products_per_row,
+              collection_style: object.settings.collection_style,
+              image_crop: object.settings.image_crop,
+              show_product_description: object.settings.show_product_description,
+              truncated_words: object.settings.truncated_words
+      %}
+    {% else %}
+      {% if object.settings.collection_style == 'grid' %}
+        {% for i in (1..object.settings.frontpage_products_limit) %}
+          <div class="{% render 'column-width', value: object.settings.frontpage_products_per_row %} column
+                      {% if settings.mobile_products_per_row == '1' %}
+                        medium-down--one-whole
+                      {% else %}
+                        medium-down--one-half
+                      {% endif %}
+                      thumbnail">
+            <a class="thumbnail__link">
+              <div class="thumbnail__image">
+                {% capture num %}{% cycle "1", "2", "3", "4", "5", "6" %}{% endcapture %}
+                {{ 'collection-' | append: num | placeholder_svg_tag: 'placeholder-svg placeholder-svg--product' }}
+              </div>
+
+              <div class="thumbnail__content thumbnail__content--{{ settings.collection_price_position }} thumbnail__content--vendor-{{ settings.display_vendor_collection }}">
+                <span class="thumbnail__title">{{ 'homepage.onboarding.product_title' | t }}</span>
+                
+                <span class="thumbnail__price">
+                  <span>$49.60</span>
+                </span>
+              </div>
+            </a>
+          </div>
+        {% endfor %}
+      {% else %}
+        {% for i in (1..object.settings.frontpage_products_limit) %}
+          <div class="{% render 'column-width', value: object.settings.frontpage_products_per_row %} column medium-down--one-whole thumbnail thumbnail--{{ object.settings.collection_style }}">
+            <a class="thumbnail__link">
+              <div class="thumbnail__container">
+                <div class="thumbnail__image">
+                  {% capture num %}{% cycle "1", "2", "3", "4", "5", "6" %}{% endcapture %}
+                  {{ 'collection-' | append: num | placeholder_svg_tag: 'placeholder-svg placeholder-svg--product' }}
+                </div>
+
+                <div class="thumbnail__content">
+                  <span class="thumbnail__title">{{ 'homepage.onboarding.product_title' | t }}</span>
+                  
+                  {% if object.settings.show_product_description %}
+                    <div class="thumbnail__description">
+                      {% if object.settings.truncated_words == 'none' %}
+                        {{ 'homepage.onboarding.product_description' | t }}
+                      {% else %}
+                        {{ 'homepage.onboarding.product_description' | t | truncatewords: object.settings.truncated_words }}
+                      {% endif %}
+                    </div>
+                  {% endif %}
+
+                  <span class="thumbnail__price">
+                    <span>$49.60</span>
+                  </span>
+                </div>
+              </div>
+            </a>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endif %}
+  </div>
+</section>

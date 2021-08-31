@@ -1,0 +1,302 @@
+{%- assign search_pagination = section.settings.pagination_limit -%}
+
+{% paginate search.results by search_pagination %}
+  {% comment %} Check to see if sidebar should be enabled {% endcomment %}
+  {% if section.blocks.size > 0 %}
+    {%- assign sidebar = true -%}
+  {% else %}
+    {%- assign sidebar = false -%}
+  {% endif %}
+
+  <section class="section">
+    <div class="container">
+      <div class="one-whole column content">
+        <h1>{{ 'general.search.title' | t }}</h1>
+        <div class="feature_divider"></div>
+      </div>
+
+      {% if section.settings.search_breadcrumb %}
+        <div class="one-whole column breadcrumb--text">
+          <a href="{{ shop.url }}" title="{{ shop.name | escape }}" class="breadcrumb_link">{{ 'general.breadcrumbs.home' | t }}</a>
+          &nbsp;<span class="icon-arrow-right"></span>
+          <a href="{{ routes.search_url }}" class="breadcrumb_link">{{ 'general.search.title' | t }}</a>
+
+          {% if paginate.pages != 0 %}
+            &nbsp;<span class="icon-arrow-right"></span>
+            {{ 'general.breadcrumbs.page' | t: current_page: paginate.current_page, pages: paginate.pages }}
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+    <div class="content-wrapper is-flex is-flex-wrap">
+      {% render 'sidebar' %}
+
+      <div class="has-sidebar-option sidebar-enabled--{{ sidebar }}">
+            {% if search.performed %}
+              {% if settings.search_option == 'product,page,article' or search.results.first.price == blank %}
+                {% if search.results == empty %}
+                  <br />
+                  <br />
+                  <p class="quote">{{ 'general.search.no_results_html' | t: terms: search.terms }}</p>
+                  <br />
+                  <br />
+                {% else %}
+                  {% for item in search.results %}
+                  <div class="product-row">
+                    <div class="container">
+
+
+                    {%- assign featured_image = false -%}
+
+                    {% if item.object_type == 'article' and item.featured_media.preview_image %}
+                      {%- assign featured_image = true -%}
+
+                      <div class="one-fourth column medium-down--one-whole">
+                        <a href="{{ item.url }}" title="{{ item.title | escape }}">
+                          {% render 'image-element',
+                                  image: item.featured_media.preview_image,
+                                  alt: item.title
+                          %}
+                        </a>
+                      </div>
+                    {% elsif item.featured_media.preview_image %}
+                      {%- assign featured_image = true -%}
+
+                      <div class="one-fourth column medium-down--one-whole">
+                        <a href="{{ item.url }}" title="{{ item.title | escape }}">
+                          {% render 'image-element',
+                                  image: item.featured_media.preview_image,
+                                  alt: item.title
+                          %}
+                        </a>
+                      </div>
+                    {% endif %}
+
+                    <div class="{% if featured_image %}three-fourths columns medium-down--one-whole{% else %}one-whole column{% endif %} is-flex is-flex-wrap is-flex-column is-justify-center">
+                      <h5 class="sub_title">
+                        <a href="{{ item.url }}" title="{{ item.title | escape }}">{{ item.title }}</a>
+                      </h5>
+
+                      {% if item.price %}
+                        <div class="info">
+                          <span class="price">
+                            {% if item.compare_at_price_max > item.price %}
+                              <span class="was_price">
+                                <span class="money">{% render 'price-element', price: item.compare_at_price_max %}</span>
+                              </span>
+                            {% endif %}
+
+                            {% if item.available %}
+                              {% if item.price_varies %}
+                                {% if item.compare_at_price_max > item.price %}
+                                  <br />
+                                {% endif %}
+                                <small><em>{{ 'products.general.from' | t }}</em></small>
+                              {% endif %}
+
+                              <span class="money">{% render 'price-element', price: item.price_min %}</span>
+                            {% else %}
+                              <span class="money">{% render 'price-element', price: item.price_min %}</span> - {{ 'products.product.sold_out' | t }}
+                            {% endif %}
+                          </span>
+                        </div>
+                      {% endif %}
+
+                      {% if item.object_type == 'article' %}
+                        <p class="blog_meta">
+                          {% if section.settings.blog_author %}
+                            <span>{{ 'blogs.article.by_author' | t: author: item.author }}</span>
+                          {% endif %}
+
+                          {% if section.settings.blog_date %}
+                            <span>{{ item.published_at | date: format: "month_day_year" }}</span>
+                          {% endif %}
+                        </p>
+                      {% endif %}
+
+                      {% if item.excerpt %}
+                        <div class="excerpt">{{ item.excerpt }}</div>
+
+                        {% if section.settings.read_more_link %}
+                          <p><a href="{{ item.url }}" title="{{ item.title | escape }}">{{ 'blogs.general.continue_reading_html' | t }}</a></p>
+                        {% endif %}
+                      {% else %}
+                        <p>{{ item.content | strip_html | truncatewords: 40 | highlight: search.terms | replace: 'Description', '' | replace: 'Specs', '' | replace: 'Shipping', '' | replace: 'Size', '' }}</p>
+                      {% endif %}
+                    </div>
+                    <div class="one-whole column">
+                      <hr>
+                    </div>
+                    </div>
+
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              {% else %}
+                <div class="container">
+                  {%- assign products = search.results -%}
+                  {%- assign products_per_row = section.settings.products_per_row -%}
+
+                  {% render 'product-loop',
+                          limit: section.settings.pagination_limit,
+                          products: products,
+                          products_per_row: products_per_row,
+                          sidebar: sidebar
+                  %}
+                </div>
+              {% endif %}
+              
+            <div class="container">
+              {% render 'pagination', paginate: paginate %}
+            </div>
+          {% else %}
+            <div class="search_page container is-justify-center">
+              <div data-autocomplete-{{ settings.enable_autocomplete }}>
+                <h3 class="center">{{ 'general.search.description' | t }}</h3>
+
+                <form class="search" action="{{ routes.search_url }}">
+                  <input type="hidden" name="type" value="{{ settings.search_option }}" />
+                  <input type="text" name="q" placeholder="{{ 'general.search.placeholder' | t }}" value="{{ search.terms }}" x-webkit-speech autocapitalize="off" autocomplete="off" autocorrect="off" />
+                  <input type="submit" name="submit" class="action_button" value="{{ 'general.search.submit' | t }}" style="margin-top:0" />
+                </form>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+  </section>
+{% endpaginate %}
+
+{% schema %}
+  {
+    "name": "Search",
+    "class": "shopify-section--search-template",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "search_breadcrumb",
+        "label": "Show breadcrumb",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Products"
+      },
+      {
+        "type": "range",
+        "id": "products_per_row",
+        "label": "Products per row",
+        "min": 2,
+        "max": 4,
+        "step": 1,
+        "default": 3
+      },
+      {
+        "type": "range",
+        "id": "pagination_limit",
+        "label": "Products per page",
+        "min": 2,
+        "max": 50,
+        "step": 1,
+        "default": 48
+      },
+      {
+        "type": "header",
+        "content": "Blog results"
+      },
+      {
+        "type": "checkbox",
+        "id": "blog_author",
+        "label": "Show author"
+      },
+      {
+        "type": "checkbox",
+        "id": "read_more_link",
+        "label": "Show continue reading link for blog post excerpts",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "blog_date",
+        "label": "Show date",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Sidebar"
+      },
+      {
+        "type": "paragraph",
+        "content": "Create a sidebar by adding content blocks."
+      },
+      {
+        "type": "checkbox",
+        "id": "toggle",
+        "label": "Toggle sidebar content",
+        "default": false
+      }
+    ],
+    "blocks": [
+      {
+        "type": "filter_by_collection",
+        "name": "Collection list",
+        "limit": 1
+      },
+      {
+        "type": "menu",
+        "name": "Menu",
+        "settings": [
+          {
+            "type": "link_list",
+            "id": "custom_menu_linklist",
+            "label": "Menu"
+          }
+        ]
+      },
+      {
+        "type": "page",
+        "name": "Page",
+        "settings": [
+          {
+            "type": "page",
+            "id": "content_page",
+            "label": "Page"
+          }
+        ]
+      },
+      {
+        "type": "filter_by_tag",
+        "name": "Tag list",
+        "limit": 1
+      },
+       {
+        "type": "text",
+        "name": "Text",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Heading",
+            "default": "Heading"
+          },
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Text area can be used for special announcements or general information.</p>"
+          }
+        ]
+      },
+      {
+        "type": "filter_by_type",
+        "name": "Type list",
+        "limit": 1
+      },
+      {
+        "type": "filter_by_vendor",
+        "name": "Vendor list",
+        "limit": 1
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,42 @@
+<section class="section">
+  <div class="container image-gallery">
+    <div class="one-third column medium-down--one-whole">
+      {% if block.settings.image_1 != blank %}
+        <a href="javascript:;" data-fancybox="{{ block.id }}" data-src="{{ block.settings.image_1 | img_url: '1520x' }}" rel="detail-gallery">
+          {% render 'image-element',
+                  image: block.settings.image_1,
+                  alt: block.settings.image_1.alt
+          %}
+        </a>
+      {% else %}
+        {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+      {% endif %}
+    </div>
+
+    <div class="one-third column medium-down--one-whole">
+      {% if block.settings.image_2 != blank %}
+        <a href="javascript:;" data-fancybox="{{ block.id }}" data-src="{{ block.settings.image_2 | img_url: '1520x' }}" rel="detail-gallery">
+          {% render 'image-element',
+                  image: block.settings.image_2,
+                  alt: block.settings.image_2.alt
+          %}
+        </a>
+      {% else %}
+        {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+      {% endif %}
+    </div>
+
+    <div class="one-third column medium-down--one-whole">
+      {% if block.settings.image_3 != blank %}
+        <a href="javascript:;" data-fancybox="{{ block.id }}" data-src="{{ block.settings.image_3 | img_url: '1520x' }}" rel="detail-gallery">
+          {% render 'image-element',
+                  image: block.settings.image_3,
+                  alt: block.settings.image_3.alt
+          %}
+        </a>
+      {% else %}
+        {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+      {% endif %}
+    </div>
+  </div>
+</section>

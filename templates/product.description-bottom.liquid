@@ -1,0 +1,53 @@
+{% comment %}
+  The contents of the product.description-bottom.liquid template can be found in /sections/product-description-bottom-template.liquid
+{% endcomment %}
+
+<section class="section">
+  <div class="container content main-wrapper">
+    {% render 'product-structured-data' %}
+
+    <div class="breadcrumb__wrapper one-whole column">
+      {% if collection.previous_product or collection.next_product %}
+        <div class="page-navigation-arrows">
+          {% if collection.previous_product %}
+            <a href="{{ collection.previous_product }}" title="{{ 'products.general.previous_product_html' | t }}" class="page-navigation__next">{{ 'products.general.previous_product_html' | t }}</a>
+          {% endif %}
+
+          {% if collection.previous_product and collection.next_product %}
+            <span class="page-navigation__divider"> | </span>
+          {% endif %}
+
+          {% if collection.next_product %}
+            <a href="{{collection.next_product}}" title="{{ 'products.general.next_product_html' | t }}" class="page-navigation__next">{{ 'products.general.next_product_html' | t }}</a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <div class="breadcrumb breadcrumb--text">
+        <a href="{{ shop.url }}" title="{{ shop.name | escape }}">{{ 'general.breadcrumbs.home' | t }}</a>
+
+        <span class="icon-arrow-right"></span>
+
+        {% if collection %}
+          <a href="{{ collection.url }}" title="{{ collection.title | escape }}">{{ collection.title }}</a>
+        {% else %}
+          <a href="{{ routes.all_products_collection_url }}" title="{{ collections.all.title }}">{{ collections.all.title }}</a>
+        {% endif %}
+
+        <span class="icon-arrow-right"></span>
+
+        {{ product.title }}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--has-sidebar-option">
+  <div class="container">
+    {% section 'product__sidebar' %}
+
+    {% section 'product-description-bottom-template' %}
+
+    {% section 'product-recommendations' %}
+  </div>
+</section>

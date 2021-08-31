@@ -1,0 +1,43 @@
+<section class="section">
+  <div class="container content main-wrapper page">
+    <div class="one-whole column">
+      <h1 class="center">
+        {{ page.title }}
+      </h1>
+      <div class="feature_divider"></div>
+    </div>
+
+    {% if page.content contains "<!-- split -->" %}
+      {{ page.content | split: "<!-- split -->" | last }}
+    {% endif %}
+
+    {%- assign imgs = page.content | split: 'src="' -%}
+
+    {% capture src_array %}
+      {% for img in imgs %}
+        {{ img | split: '"' | first | replace: '//cdn', 'http://cdn' | replace: 'http:http://', 'http://' | remove: 'https:' | remove: 'http:' }}~
+        {%- assign imageAmount = forloop.length | minus: 1 -%}
+      {% endfor %}
+    {% endcapture %}
+
+    {%- assign srcArray = src_array | split: '~' -%}
+
+    {%- assign alts = page.content | split: 'alt="' -%}
+
+    {% capture altArray %}
+      {% for alt in alts %}
+        {{ alt | split: '"' | first }}~
+      {% endfor %}
+    {% endcapture %}
+
+    {%- assign altArray = altArray | split: '~' -%}
+
+    {% for index in (1..imageAmount) %}
+      <div class="one-third column medium-down--one-whole">
+        <a href="{{ srcArray[index] | strip }}" title="{{ altArray[index] | strip }}" rel="gallery" data-fancybox-group="{{ page.handle }}">
+          <img src="{{ srcArray[index] | strip }}" alt="{{ altArray[index] | strip }}"/>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+</section>

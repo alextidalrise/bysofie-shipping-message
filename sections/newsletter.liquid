@@ -1,0 +1,193 @@
+{% comment %}
+** Newsletter - dynamic **
+- Draggable section
+{% endcomment %}
+
+{% comment %} Content settings {% endcomment %}
+{%- assign title = section.settings.title | escape -%}
+{%- assign subheading = section.settings.subheading | escape -%}
+{%- assign newsletter_richtext = section.settings.newsletter_richtext -%}
+{% comment %} End content settings {% endcomment %}
+
+{% if section.settings.display_first_name %}
+  {% if section.settings.display_last_name %}
+    {%- assign displayMode = 'nl--one-whole' -%}
+  {% else %}
+    {%- assign displayMode = 'nl--one-half' -%}
+  {% endif %}
+{% else %}
+  {% if section.settings.display_last_name %}
+    {%- assign displayMode = 'nl--one-half' -%}
+  {% else %}
+    {%- assign displayMode = '' -%}
+  {% endif %}
+{% endif %}
+
+<section class="section {% if section.settings.wide_display %}is-width-wide{% endif %}">
+  <div class="container">
+    <div class="one-whole column text-align--{{ section.settings.frontpage_text_align }}">
+      {% if title != blank %}
+        <h2 class="title align_{{ section.settings.frontpage_text_align }}">{{ title }}</h2>
+      {% endif %}
+
+      {% if subheading != blank %}
+        <p>{{ subheading }}</p>
+      {% endif %}
+
+      {% if newsletter_richtext != blank %}
+        <div class="newsletter-text">
+          {{ newsletter_richtext }}
+        </div>
+      {% endif %}
+
+      <div class="newsletter newsletter--{{ section.settings.frontpage_text_align }}">
+        {% form 'customer' %}
+          {% if form.posted_successfully? %}
+            <p class="message">{{ 'general.newsletter_form.success_text' | t }}</p>
+          {% elsif form.errors %}
+            {% for field in form.errors %}
+              <p class="message">{{ field }} - {{ form.errors.messages[field] }}</p>
+            {% endfor %}
+          {% else %}
+
+            {% if template contains "password" %}
+              <input type="hidden" name="contact[tags]" value="prospect,password page"/>
+            {% else %}
+              <input type="hidden" name="contact[tags]" value="newsletter"/>
+            {% endif %}
+
+            <div class="input-row">
+              {% if section.settings.display_first_name %}
+                <input class="newsletter-half first-name" type="text" name="contact[first_name]" placeholder="{{ 'general.newsletter_form.subscriber_first_name' | t }}" />
+              {% endif %}
+              {% if section.settings.display_last_name %}
+                <input class="newsletter-half last-name" type="text" name="contact[last_name]" placeholder="{{ 'general.newsletter_form.subscriber_last_name' | t }}" />
+              {% endif %}
+
+              {% if section.settings.display_first_name and section.settings.display_last_name %}
+                </div>
+                <div class="input-row">
+              {% endif %}
+
+              <input type="hidden" name="challenge" value="false" />
+              <input type="email" class="contact_email" name="contact[email]" required placeholder="{{ 'general.newsletter_form.placeholder' | t }}" />
+              <input type='submit' class="action_button sign_up" value="{{ 'general.newsletter_form.submit' | t }}" />
+            </div>
+          {% endif %}
+        {% endform %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  {% if section.settings.wide_display %}
+    #shopify-section-{{ section.id }} {
+      padding: 20px 0;
+      color: {{ section.settings.newsletter_text }};
+      background-color: {{ section.settings.newsletter_background }};
+    }
+  {% else %}
+    #shopify-section-{{ section.id }} .container .column {
+      padding: 40px 0;
+      color: {{ section.settings.newsletter_text }};
+      background-color: {{ section.settings.newsletter_background }};
+    }
+
+    @media only screen and (max-width: 798px) {
+      #shopify-section-{{ section.id }} .container .column {
+        padding: 20px 0;
+      }
+    }
+  {% endif %}
+
+  @media only screen and (max-width: 798px) {
+    #shopify-section-{{ section.id }} {
+      background-color: {{ section.settings.newsletter_background }};
+    }
+
+    #shopify-section-{{ section.id }} .section.is-width-wide {
+      width: 95%;
+    }
+  }
+</style>
+
+{% schema %}
+  {
+    "name": "Newsletter",
+    "class": "shopify-section--newsletter",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "wide_display",
+        "default": true,
+        "label": "Wide display"
+      },
+      {
+        "type": "checkbox",
+        "id": "display_first_name",
+        "label": "Show first name"
+      },
+      {
+        "type": "checkbox",
+        "id": "display_last_name",
+        "label": "Show last name"
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Newsletter"
+      },
+      {
+        "type": "text",
+        "id": "subheading",
+        "label": "Subheading",
+        "default": "Sign up to get the latest on sales, new releases and more …"
+      },
+      {
+        "type": "richtext",
+        "id": "newsletter_richtext",
+        "label": "Text"
+      },
+      {
+        "type": "select",
+        "id": "frontpage_text_align",
+        "label": "Text alignment",
+        "default": "center",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          },
+          {
+            "value": "center",
+            "label": "Center"
+          },
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ]
+      },
+      {
+        "type": "color",
+        "id": "newsletter_background",
+        "label": "Background",
+        "default": "#ede9dd"
+      },
+      {
+        "type": "color",
+        "id": "newsletter_text",
+        "label": "Text",
+        "default": "#303030"
+      }
+    ],
+    "presets": [{
+      "name": "Newsletter",
+      "category": "Promotional",
+      "settings": {
+      }
+    }]
+  }
+{% endschema %}

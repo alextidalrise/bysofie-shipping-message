@@ -1,0 +1,73 @@
+{% comment %}
+** Image with text - dynamic **
+- Draggable section
+{% endcomment %}
+
+{% comment %} Assign object as block or section {% endcomment %}
+{% if type == 'block' %}
+  {%- assign object = block -%}
+{% else %}
+  {%- assign object = section -%}
+{% endif %}
+
+{% comment %} Content settings {% endcomment %}
+{%- assign image = object.settings.image -%}
+{%- assign text = object.settings.text -%}
+{%- assign title = object.settings.title -%}
+{%- assign button_label = object.settings.button_label -%}
+{%- assign button_link = object.settings.button_link -%}
+{% comment %} End content settings {% endcomment %}
+
+{% if page.handle == 'our-story' %}
+  {%- assign image_class = 'our-story-image3' -%}
+{% else %}
+  {%- assign image_class = '' -%}
+{% endif %}
+
+<section class="{% if page.handle == 'our-story' %}our-story {% endif %}section">
+  <div class="container is-align-center text-align-{{ object.settings.text_alignment }}">
+    {% capture image_layout %}
+      <div class="image-with-text__image-column one-half column medium-down--one-whole {% if object.settings.layout == 'left' %}animate_left{% else %}animate_right{% endif %}">
+        <a {% if button_link != blank %}href="{{ button_link }}"{% endif %} title="{{ title | escape }}">
+          {% if image != blank %}
+            {% render 'image-element',
+                    image: image,
+                    alt: image.alt,
+          			additional_classes: image_class
+            %}
+          {% else %}
+            {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+          {% endif %}
+        </a>
+      </div>
+    {% endcapture %}
+
+    {% if object.settings.layout == 'left' %}
+      {{ image_layout }}
+    {% endif %}
+
+    <div class="image-with-text__text-column one-half column medium-down--one-whole">
+      <div class="image-with-text__wrapper">
+        {% if title != blank %}
+          {% if page.handle == 'our-story' %}
+        	<h1 class="our_story_title">{{ title | escape }}</h1>
+          {% else %}
+            <h3 class="title">{{ title | escape }}</h3>
+          {% endif %}
+        {% endif %}
+
+        {% if text != blank %}
+          {{ text }}
+        {% endif %}
+
+        {% if button_label != blank %}
+          <a {% if button_link != blank %}href="{{ button_link }}"{% endif %} class="action_button">{{ button_label | escape }}</a>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if object.settings.layout == 'right' %}
+      {{ image_layout }}
+    {% endif %}
+  </div>
+</section>

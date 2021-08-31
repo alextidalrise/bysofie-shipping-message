@@ -1,0 +1,13 @@
+{% if section.settings.product_breadcrumb %}
+  <div class="breadcrumb--text">
+    <a href="{{ shop.url }}" title="{{ shop.name | escape }}">{{ 'general.breadcrumbs.home' | t }}</a>
+    &nbsp;<span class="icon-arrow-right"></span>
+    {% if collection %}
+      <a href="{{ collection.url }}" title="{{ collection.title | escape }}">{{ collection.title }}</a>
+    {% else %}
+      <a href="{{ routes.all_products_collection_url }}" title="{{ collections.all.title }}">{{ collections.all.title }}</a>
+    {% endif %}
+    &nbsp;<span class="icon-arrow-right"></span>
+    {{ product.title }}
+  </div>
+{% endif %}

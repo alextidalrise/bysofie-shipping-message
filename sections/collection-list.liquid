@@ -1,0 +1,155 @@
+{% comment %}
+** Collection list - dynamic **
+- Draggable section
+- Uses blocks
+{% endcomment %}
+
+{% comment %} Content settings {% endcomment %}
+{%- assign title = section.settings.title | escape -%}
+{%- assign blocks = section.blocks -%}
+{% comment %} End content settings {% endcomment %}
+
+<section class="section">
+  <div class="container">
+    {% if title != blank %}
+      <div class="one-whole column center">
+        <h2 class="title">
+          {{ title }}
+        </h2>
+        <div class="feature_divider"></div>
+      </div>
+    {% endif %}
+
+    {% if blocks.size > 0 %}
+      {% for block in blocks %}
+        {% comment %} Content settings {% endcomment %}
+        {%- assign collection = collections[block.settings.feature_collection] -%}
+        {%- assign image = block.settings.image -%}
+        {% comment %} End content settings {% endcomment %}
+
+        {% if image != blank %}
+          {%- assign collection_image = image -%}
+          {%- assign collection_image_alt = image.alt | escape -%}
+        {% elsif collection.image != blank %}
+          {%- assign collection_image = collection.image -%}
+          {%- assign collection_image_alt = collection.title | escape -%}
+        {% else collection.empty? == false %}
+          {%- assign collection_image = collection.products.first.featured_image -%}
+          {%- assign collection_image_alt = collection.products.first.featured_image.alt | escape -%}
+        {% endif %}
+
+        <div class="{% render 'column-width', value: section.settings.frontpage_collections_per_row %} column {% if settings.mobile_products_per_row == '1' %}medium-down--one-whole{% else %}medium-down--one-half{% endif %} thumbnail {% if section.settings.collection_count == blank and section.settings.frontpage_collections_title == blank %}blank{% endif %}">
+          <a href="{{ collection.url }}" title="{{ collection.title }}">
+            <div class="product-wrap">
+              {% if collection_image != blank %}
+                <div class="image__container">
+                  {% render 'image-element',
+                          image: collection_image.src,
+                          alt: collection_image_alt,
+                          object_fit: true
+                  %}
+                </div>
+              {% else %}
+                {% capture num %}{% cycle "1", "2", "3", "4", "5", "6" %}{% endcapture %}
+                {{ 'collection-' | append: num | placeholder_svg_tag: 'placeholder-svg' }}
+              {% endif %}
+            </div>
+
+            <div class="thumbnail__content thumbnail__content--{{ settings.collection_price_position }} thumbnail__content--vendor-{{ settings.display_vendor_collection }}">
+              {% if section.settings.frontpage_collections_title %}
+                <span class="thumbnail__title">
+                  {% if collection != blank %}
+                    {{ collection.title }}
+                  {% else %}
+                    {{ "homepage.onboarding.collection_title" | t }}
+                  {% endif %}
+                </span>
+              {% endif %}
+
+              {% if section.settings.collection_count %}
+                <span class="thumbnail__price">
+                  {% if collection != blank %}
+                    {{ 'layout.counts.items_with_count' | t: count: collection.all_products_count }}
+                  {% else %}
+                    {{ 'layout.counts.items_with_count' | t: count: 3 }}
+                  {% endif %}
+                </span>
+              {% endif %}
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Collection list",
+    "class": "shopify-section--collection-list",
+    "max_blocks": 8,
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Collection list"
+      },
+      {
+        "type": "range",
+        "id": "frontpage_collections_per_row",
+        "label": "Collections per row",
+        "min": 2,
+        "max": 5,
+        "step": 1,
+        "default": 3
+      },
+      {
+        "type": "checkbox",
+        "id": "frontpage_collections_title",
+        "label": "Display collection title",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "collection_count",
+        "label": "Display collection product count",
+        "default": true
+      }
+    ],
+    "blocks": [
+      {
+        "type": "collection",
+        "name": "Collection",
+        "settings": [
+          {
+            "type": "collection",
+            "id": "feature_collection",
+            "label": "Collection"
+          },
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image",
+            "info": "800 x 800px recommended"
+          }
+        ]
+      }
+    ],
+    "presets": [{
+      "name": "Collection list",
+      "category": "Collection",
+      "blocks": [
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        },
+        {
+          "type": "collection"
+        }
+      ]
+    }]
+  }
+{% endschema %}

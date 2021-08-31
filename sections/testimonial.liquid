@@ -1,0 +1,148 @@
+{% comment %}
+** Testimonials - dynamic **
+- Draggable section
+- Uses blocks
+{% endcomment %}
+
+{% comment %} Content settings {% endcomment %}
+{%- assign blocks = section.blocks -%}
+{%- assign title = section.settings.title -%}
+{% comment %} End content settings {% endcomment %}
+
+<section class="section">
+  <div class="container">
+    {% if title != blank %}
+      <div class="one-whole column">
+        <h2 class="title center">
+          {{ title }}
+        </h2>
+        <div class="feature_divider"></div>
+      </div>
+    {% endif %}
+
+    {% if blocks.size > 0 %}
+      {% for block in blocks %}
+        {% comment %} Content settings {% endcomment %}
+        {%- assign testimonial = block.settings.testimonial -%}
+        {% comment %} End content settings {% endcomment %}
+
+        <div class="testimonial-block {% render 'column-width', value: section.settings.testimonials_per_row %} columns medium-down--one-whole" {{ block.shopify_attributes }}>
+          {% if block.settings.image != blank %}
+            <div class="{% if section.settings.rounded_image != blank %}rounded{% endif %}">
+              {% render 'image-element',
+                      image: block.settings.image,
+                      alt: block.settings.image.alt,
+                      additional_classes: 'testimonial__image'
+              %}
+            </div>
+          {% endif %}
+
+          <div class="testimonial-block__text">
+            {{ testimonial }}
+          </div>
+
+          {% if block.settings.name != blank %}
+            <p>
+              <span class="testimonial-dash">&mdash; </span>
+
+              {% if block.settings.site_link != blank %}
+                <a href="{{ block.settings.site_link }}" target="_blank">
+              {% endif %}
+
+              <span class="name">
+                {% if block.settings.site_link == blank %}<strong>{% endif %}
+                  {{ block.settings.name | escape }}
+                {% if block.settings.site_link == blank %}</strong>{% endif %}
+              </span>
+
+              {% if block.settings.site_link != blank %}
+                </a>
+              {% endif %}
+            </p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Testimonials",
+    "class": "shopify-section--testimonials",
+    "max_blocks": 12,
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Testimonials"
+      },
+      {
+        "type": "checkbox",
+        "id": "rounded_image",
+        "label": "Rounded images",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "testimonials_per_row",
+        "label": "Testimonials per row",
+        "min": 1,
+        "max": 3,
+        "step": 1,
+        "default": 3
+      }
+    ],
+    "blocks": [
+      {
+        "type": "quote",
+        "name": "Testimonial",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Testimonial image",
+            "info": "400 x 400px recommended"
+          },
+          {
+            "type": "richtext",
+            "id": "testimonial",
+            "label": "Testimonial",
+            "default": "<p>Include some of your favorite customer quotes and feedback here as social proof, to build credibility and trust for your services and products.</p>"
+          },
+          {
+            "type": "text",
+            "id": "name",
+            "label": "Customer name",
+            "info": "Optional",
+            "default": "John Doe"
+          },
+          {
+            "type": "url",
+            "id": "site_link",
+            "label": "Link",
+            "info": "Optional"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Testimonials",
+        "category": "Text",
+        "blocks": [
+          {
+            "type": "quote"
+          },
+          {
+            "type": "quote"
+          },
+          {
+            "type": "quote"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

@@ -1,0 +1,178 @@
+{% comment %}
+** Video - dynamic **
+- Draggable section
+{% endcomment %}
+
+{% comment %} Assign object as block or section {% endcomment %}
+{% if type == 'block' %}
+  {%- assign object = block -%}
+{% else %}
+  {%- assign object = section -%}
+{% endif %}
+
+{%- assign id = object.id -%}
+{%- assign wide_display = object.settings.wide_display -%}
+{%- assign aspect_ratio = object.settings.aspect_ratio -%}
+{%- assign autoplay = object.settings.autoplay -%}
+{%- assign autoloop = object.settings.autoloop -%}
+{%- assign mute_video = object.settings.mute_video -%}
+{%- assign video_controls = object.settings.video_controls -%}
+{%- assign darken_video = object.settings.video_dark_overlay -%}
+{%- assign parallax_enabled = object.settings.parallax_effect -%}
+{%- assign image = object.settings.image -%}
+{%- assign text_alignment = object.settings.text_alignment -%}
+{%- assign text_position = object.settings.text_position -%}
+{%- assign title = object.settings.title -%}
+{%- assign subtitle = object.settings.subtitle -%}
+{%- assign button_label = object.settings.button_label -%}
+{%- assign link = object.settings.link -%}
+{%- assign homepage_arrow = object.settings.homepage_arrow -%}
+{%- assign headline_animation = object.settings.headline_animation -%}
+{%- assign display_text_over_video = object.settings.display_text_over_video -%}
+{%- assign iframe_video = object.settings.iframe_video -%}
+{%- assign html5_video = object.settings.html5_video -%}
+{%- assign text_position = object.settings.text_position | split: ' ' -%}
+
+{% capture video_text %}
+  <div class="container video__text-container display-text-over-video--{{ display_text_over_video }}" data-video-text-container>
+    <div class="video__text text-align--{{ text_position[0] }} {{ headline_animation }}">
+      <div class="video__text-wrapper">
+        {% if title != blank %}
+          <h1 class="headline" data-video-text>{{ title | escape }}</h1>
+        {% endif %}
+        {% if subtitle != blank %}
+          <div class="subtitle" data-video-text>{{ subtitle }}</div>
+        {% endif %}
+        {% if button_label != blank %}
+        <a class="action_button" data-play-button {% if link != blank %}href="{{ link }}"{% endif %}>
+          {{ button_label | escape }}
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endcapture %}
+
+{% comment %} HTML markup {% endcomment %}
+<section class="section {% if object.settings.wide_display %}is-width-wide has-no-side-gutter{% endif %}">
+  <div class="container">
+    <div class="one-whole column">
+      <div class="video-wrapper
+          video-controls-enabled--{{ video_controls }}
+          darken-video--{{ darken_video }}
+          image-focal-point--{{ object.settings.image_focal_point }}
+          mobile-parallax-enabled--{{ settings.enable_mobile_parallax }}
+          mobile-image-crop-enabled--{{ settings.slideshow_images_crop }}"
+          id="video-{{ id }}"
+          data-autoplay="{{ autoplay }}"
+          data-autoloop="{{ object.settings.autoloop }}"
+          data-mute-video="{{ object.settings.mute_video }}"
+          data-video-src="{{ iframe_video.id }}"
+          data-aspect-ratio="{{ aspect_ratio }}"
+          data-poster-image-uploaded="{% if image != blank %}true{% else %}false{% endif%}">
+        <div class="video__overlay"></div>
+        {% if parallax_enabled %}
+          <div class="parallax__wrap horizontal-text-position--{{ text_position[0] }} vertical-text-position--{{ text_position[1] }}">
+            {{ video_text }}
+            <div class="parallax"
+              {% if image != blank %}
+                data-parallax-image="{{ image | img_url: '2048x' }}"
+              {% elsif html5_video == blank and iframe_video == blank %}
+                style="background-image:url({{ 'placeholder.svg' | asset_url }})"
+              {% endif %}>
+              <noscript>
+                <img src="{{ image | img_url: '2000x' }}" alt="{{ alt | escape }}" class="image__fallback">
+              </noscript>
+            </div>
+            <img alt
+            class="mobile-placeholder-svg"
+            src="data:image/svg+xml;utf8,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='{{ image.width }}'%20height='{{ image.height }}'></svg>"/>
+        {% else %}
+          <div class="banner__wrap">
+            <div class="banner horizontal-text-position--{{ text_position[0] }} vertical-text-position--{{ text_position[1] }}">
+              {{ video_text }}
+            </div>
+            {% if object.settings.image != blank %}
+              <div class="banner__image-wrapper">
+                {% render 'image-element',
+                          image: object.settings.image,
+                          alt: object.settings.image.alt,
+                          stretch_width: true
+                %}
+              </div>
+            {% elsif html5_video == blank and iframe_video == blank %}
+              <img src="{{ 'placeholder.svg' | asset_url }}"/>
+            {% endif %}
+        {% endif %}
+
+        {% comment %} Checks there is an iframe video (YouTube or Vimeo) {% endcomment %}
+        {% if iframe_video != blank %}
+          {% if iframe_video.type == 'vimeo' %}
+            <div class="plyr__video-embed" id="video-{{ id }}" data-video-element data-external-video>
+              <iframe src="https://player.vimeo.com/video/{{ iframe_video.id }}?loop=false&amp;byline=false&amp;portrait=false&amp;title=false&amp;speed=true&amp;transparent=0&amp;gesture=media" allowfullscreen allowtransparency allow="autoplay"></iframe>
+            </div>
+          {% elsif iframe_video.type == 'youtube' %}
+            <div class="plyr__video-embed" id="video-{{ id }}" data-video-element data-external-video>
+              <iframe src="https://www.youtube.com/embed/{{ iframe_video.id }}?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1" allowfullscreen allowtransparency allow="autoplay"></iframe>
+            </div>
+          {% endif %}
+          {% comment %} Checks there is an HTML5 video {% endcomment %}
+        {% elsif html5_video != blank %}
+          <video class="video-{{ id }}" data-video-element data-html5-video>
+            <source src="{{ html5_video }}">
+          </video>
+        {% endif %}
+
+        {% if homepage_arrow %}
+          <a href="#slide-{{ id }}-content" class="scroll-arrow">
+            <span class="icon-arrow-down"></span>
+          </a>
+        {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<a name="slide-{{ id }}-content" id="slide-{{ id }}-content"></a>
+
+<style>
+  {% if object.settings.parallax_effect %}
+    #block__{{ object.id }} .parallax__wrap,
+    #block__{{ object.id }} .parallax__container .parallax,
+    #shopify-section-{{ object.id }} .parallax__wrap,
+    #shopify-section-{{ object.id }} .parallax__container .parallax {
+      height: {{ object.settings.parallax_image_height }}px;
+    }
+  {% endif %}
+
+  #block__{{ object.id }} .parallax__container .parallax,
+  #shopify-section-{{ object.id }} .parallax__container .parallax {
+    background-position: {{ object.settings.image_focal_point}} !important;
+  }
+
+  #block__{{ object.id }} .banner__wrap img,
+  #shopify-section-{{ object.id }} .banner__wrap img {
+    object-position: {{ object.settings.image_focal_point }};
+    -o-object-position: {{ object.settings.image_focal_point }};
+  }
+
+  @media only screen and (max-width: 798px) {
+    {% if settings.slideshow_images_crop or object.settings.parallax_effect and settings.enable_mobile_parallax %}
+      #block__{{ object.id }} .banner__wrap,
+      #block__{{ object.id }} .parallax__wrap,
+      #block__{{ object.id }} .parallax__container .parallax,
+      #shopify-section-{{ object.id }} .banner__wrap,
+      #shopify-section-{{ object.id }} .parallax__wrap,
+      #shopify-section-{{ object.id }} .parallax__container .parallax {
+        height: {{ object.settings.parallax_image_height | divided_by: 2 }}px;
+      }
+    {% else %}
+      #block__{{ object.id }} .banner__wrap,
+      #block__{{ object.id }} .parallax__wrap,
+      #shopify-section-{{ object.id }} .banner__wrap,
+      #shopify-section-{{ object.id }} .parallax__wrap {
+        height: auto;
+      }
+    {% endif %}
+  }
+</style>

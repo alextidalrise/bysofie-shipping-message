@@ -1,0 +1,14 @@
+{% comment %}
+  The contents of the product.details-3in1.liquid template can be found in /sections/product-details-3in1-template.liquid
+{% endcomment %}
+
+{% render 'product-structured-data' %}
+
+{% section 'product-details-3in1-template' %}
+
+<section class="section">
+  <div class="container">
+    {% render 'judgeme_widgets', widget_type: 'judgeme_review_widget', concierge_install: false, product: product %}
+  </div>
+  {% section 'product-recommendations' %}
+</section>

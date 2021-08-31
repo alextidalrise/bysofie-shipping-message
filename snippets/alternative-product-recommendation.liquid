@@ -1,0 +1,19 @@
+<div class="alternative-recommendation" data-product-id={{ product.id }} {% if product.available %}style="display:none"{% endif %}>
+    {% if product.handle contains '3-in-1' %}
+        <div class="recommendation-wrapper" id="®-2-in-1">
+            <div class="product-image">
+                <img style="max-width: 100px;">
+            </div>
+            <div class="recommendation-text">
+                Sorry we are out of stock but why not try our <a id="recommended-link">{{ all_products['little-hoppa-®-2-in-1'].title }}</a> instead
+            </div>
+        </div>
+    {% elsif product.handle contains '®-2-in-1' %}
+        <div class="product-image">
+            <img style="max-width: 100px;">
+        </div>
+        <div class="recommendation-text">
+            Sorry we are out of stock but why not try our <a id="recommended-link">{{ all_products['little-hoppa-3-in-1'].title }}</a> instead
+        </div>
+    {% endif %}
+</div>

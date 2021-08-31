@@ -1,0 +1,114 @@
+{% comment %}
+** Gallery - dynamic **
+- Draggable section
+- Uses blocks
+{% endcomment %}
+
+{% comment %} Content settings {% endcomment %}
+{%- assign title = section.settings.title | escape -%}
+{%- assign blocks = section.blocks -%}
+{% comment %} End content settings {% endcomment %}
+
+<section class="section {% if section.settings.wide_display == true %}is-width-wide has-no-side-gutter{% endif %}">
+  <div class="container">
+    {% if title != blank %}
+      <div class="one-whole column">
+        <h2 class="title center">{{ title }}</h2>
+        <div class="feature_divider"></div>
+      </div>
+    {% endif %}
+
+    {% if blocks.size > 0 %}
+      {% for block in blocks %}
+        {% comment %} Content settings {% endcomment %}
+        {%- assign image = block.settings.image -%}
+        {% comment %} End content settings {% endcomment %}
+
+        <div class="gallery__item {% render 'column-width', value: section.settings.images_per_row %} column medium-down--one-whole" {{ block.shopify_attributes }}>
+          <div class="gallery__image">
+            {% if image != blank %}
+              <a
+                href="javascript:;"
+                data-fancybox="{{ section.id }}"
+                data-src="{{ image | img_url: '800x' }}"
+                class="lightbox {% if section.settings.select_layout == 'standard' %}add-padding{% endif %}"
+                rel="gallery">
+                {% render 'image-element',
+                        image: image,
+                        alt: image.alt,
+                        stretch_width: true
+                %}
+              </a>
+            {% else %}
+              {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Gallery",
+    "class": "shopify-section--gallery",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "wide_display",
+        "label": "Wide display",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Gallery"
+      },
+      {
+        "type": "range",
+        "id": "images_per_row",
+        "label": "Images per row",
+        "min": 2,
+        "max": 4,
+        "step": 1,
+        "default": 4
+      }
+    ],
+    "blocks": [
+      {
+        "type": "image",
+        "name": "Image",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image",
+            "info": "800 x 800px recommended"
+          }
+        ]
+      }
+    ],
+     "presets": [
+      {
+        "name": "Gallery",
+        "category": "Image",
+        "blocks": [
+          {
+            "type": "image"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "image"
+          },
+          {
+            "type": "image"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

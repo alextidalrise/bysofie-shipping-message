@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]><html class="ie ie6" lang="{{ shop.locale }}"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="{{ shop.locale }}"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="{{ shop.locale }}"> <![endif]-->
+<!--[if IE 9 ]><html class="ie ie9" lang="{{ shop.locale }}"> <![endif]-->
+<!--[if (gte IE 10)|!(IE)]><!--><html lang="{{ shop.locale }}"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="cleartype" content="on">
+    <meta name="robots" content="index,follow">
+
+    {% if current_tags %}{% assign meta_tags = current_tags | join: ', ' %}{% endif %}
+    <title>{% if template contains "index" %}{{ page_title }}{% else %}{{ page_title }}{% if current_tags %} {{ 'general.meta.tagged_html' | t: tags: meta_tags }}{% endif %}{% if current_page != 1 %} {{ 'general.meta.page' | t: page_number: current_page }}{% endif %}{% unless page_title contains shop.name %} - {{ shop.name }}{% endunless %}{% endif %}</title>
+
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}{% if current_tags %} {{ 'general.meta.tagged_html' | t: tags: meta_tags | escape }}.{% endif %}{% if current_page != 1 %} {{ 'general.meta.page' | t: page_number: current_page }}.{% endif %}"/>
+    {% endif %}
+
+    {% render 'social-meta-info' %}
+
+    {% if collection.previous_product %}
+      <link rel="prev" href="{{ collection.previous_product }}">
+    {% endif %}
+
+    {% if collection.next_product %}
+      <link rel="next" href="{{ collection.next_product }}">
+    {% endif %}
+
+    <!-- Mobile Specific Metas -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="{{ settings.shop_bg_color }}">
+
+    <!-- Preconnect Domains -->
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.shopify.com" crossorigin>
+    <link rel="preconnect" href="https://monorail-edge.shopifysvc.com">
+
+    <!-- Preload Assets -->
+    <link rel="preload" href="{{ 'mmenu-styles.scss' | asset_url }}" as="style">
+    <link rel="preload" href="{{ 'fancybox.css' | asset_url }}" as="style">
+    <link rel="preload" href="{{ 'styles.css' | asset_url }}" as="style">
+    <link rel="preload" href="{{ 'app.js' | asset_url }}" as="script">
+
+    <!-- Stylesheet for mmenu plugin -->
+    {{ 'mmenu-styles.scss' | asset_url | stylesheet_tag }}
+
+    <!-- Stylesheet for Fancybox library -->
+    {{ 'fancybox.css' | asset_url | stylesheet_tag }}
+
+    <!-- Stylesheets for Parallax 4.1.1 -->
+    {{ 'styles.css' | asset_url | stylesheet_tag }}
+
+    {% if settings.favicon != nil %}
+      <link rel="shortcut icon" type="image/x-icon" href="{{ settings.favicon | img_url: '180x180' }}">
+      <link rel="apple-touch-icon" href="{{ settings.favicon | img_url: '180x180' }}"/>
+      <link rel="apple-touch-icon" sizes="72x72" href="{{ settings.favicon | img_url: '72x72' }}"/>
+      <link rel="apple-touch-icon" sizes="114x114" href="{{ settings.favicon | img_url: '114x114' }}"/>
+      <link rel="apple-touch-icon" sizes="180x180" href="{{ settings.favicon | img_url: '180x180' }}"/>
+      <link rel="apple-touch-icon" sizes="228x228" href="{{ settings.favicon | img_url: '228x228' }}"/>
+    {% else %}
+      <link rel="shortcut icon" type="image/x-icon" href="{{ 'favicon.png' | asset_url }}">
+    {% endif %}
+
+    <link rel="canonical" href="{{ canonical_url }}"/>
+
+    {% if template contains 'customer' %}
+      <script src="{{ 'shopify_common.js' | shopify_asset_url }}" defer></script>
+      <script src="{{ 'customer_area.js' | shopify_asset_url }}" defer></script>
+    {% endif %}
+
+    {% if settings.show_shipping_calculator and shop.enabled_currencies.size > 1 %}
+      <script type="text/javascript" src="/services/javascripts/currencies.js" defer></script>
+      <script src="{{ 'currencies.js' | asset_url }}" defer></script>
+    {% endif %}
+
+    <script>
+      {% render 'js-variables' %}
+    </script>
+
+    <script src="{{ 'app.js' | asset_url }}" defer></script>
+    {% if template contains 'product.details' %}
+        <script src="{{ 'shipping_notice.js' | asset_url }}" defer></script>
+    	<script src="{{ 'mobile-swatches.js' | asset_url }}" defer></script>
+    	<script src="{{ 'oos-alternative-product.js' | asset_url }}" defer></script>
+    {% endif %}
+
+    {{ content_for_header }}
+
+    <noscript>
+      <style>
+
+        .slides > li:first-child { display: block; }
+        .image__fallback {
+          width: 100vw;
+          display: block !important;
+          max-width: 100vw !important;
+          margin-bottom: 0;
+        }
+
+        .no-js-only {
+          display: inherit !important;
+        }
+
+        .icon-cart.cart-button {
+          display: none;
+        }
+
+        .lazyload,
+        .cart_page_image img {
+          opacity: 1;
+          -webkit-filter: blur(0);
+          filter: blur(0);
+        }
+
+        .banner__text .container {
+          background-color: transparent;
+        }
+
+        .animate_right,
+        .animate_left,
+        .animate_up,
+        .animate_down {
+          opacity: 1;
+        }
+
+        .flexslider .slides>li {
+          display: block;
+        }
+
+        .product_section .product_form {
+          opacity: 1;
+        }
+
+        .multi_select,
+        form .select {
+          display: block !important;
+        }
+
+        .swatch-options {
+          display: none;
+        }
+
+        .parallax__wrap .banner__text {
+          position: absolute;
+          margin-left: auto;
+          margin-right: auto;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          top: 0;
+          display: -webkit-box;
+          display: -ms-flexbox;
+          display: flex;
+          -webkit-box-align: center;
+          -ms-flex-align: center;
+          align-items: center;
+          -webkit-box-pack: center;
+          -ms-flex-pack: center;
+          justify-content: center;
+        }
+
+        .parallax__wrap .image__fallback {
+          max-height: 1000px;
+          -o-object-fit: cover;
+          object-fit: cover;
+        }
+
+      </style>
+    </noscript>
+    <meta name="p:domain_verify" content="7a4768fa3057b784a6efbc2502488558"/>
+
+  {% capture cur %}{% include "booster-currency" %}{% endcapture %}{% unless cur contains "Liquid error" %}{{ cur }}{% endunless %}
+  {% include 'judgeme_core' %}
+</head>
+
+  {% if template contains "index" %}
+    {% assign feature_image = true %}
+  {% elsif template contains "collection" %}
+    {% assign feature_image = true %}
+  {% elsif template contains "blog" %}
+    {% assign feature_image = true %}
+  {% elsif template contains "article" %}
+    {% assign feature_image = true %}
+  {% elsif template contains "contact" %}
+    {% assign feature_image = true %}
+  {% elsif template contains "banner" %}
+    {% assign feature_image = true %}
+  {% else %}
+    {% assign feature_image = false %}
+  {% endif %}
+
+  <body class="{{ template | replace: '.', '-' | handle }} {% if feature_image %}feature_image{% endif %}"
+    data-money-format="{% if settings.currency_format == 'money_with_currency_format' %}{{ shop.money_with_currency_format | strip_html }}{% else %}{{ shop.money_format | strip_html }}{% endif %}"
+    data-shop-url="{{ shop.url }}"
+    data-current-lang="{{ request.locale.iso_code }}">
+    <div id="{% if template == "blog" or template == "article" or template == "page.details-custom" %}content_wrapper_bg{% else %}content_wrapper{% endif %}">
+      {% section 'header' %}
+
+      <div class="global-wrapper">
+        {% if settings.mobile_search_location == 'below-header' %}
+          {% render 'mobile-search-bar' %}
+        {% endif %}
+        {{ content_for_layout }}
+      </div>
+
+      {% render 'cart-shipping-calculator' %}
+
+      {% section 'footer' %}
+
+      <div id="search" class="animated">
+        <section class="section">
+          <div class="five-eighths columns medium-down--one-whole offset-by-three is-hidden-offset-mobile-only center">
+            <div data-autocomplete-{{ settings.enable_autocomplete }}>
+              <form action="{{ routes.search_url }}" class="search__form">
+                <input type="hidden" name="type" value="{{ settings.search_option }}" />
+                <div class="search__close">
+                  <span class="icon-close"></span>
+                </div>
+                <span class="search__submit icon-search"></span>
+                <input type="text" class="search__input" name="q" placeholder="{{ 'general.search.placeholder_with_shop_name' | t: shop_name: shop.name }}" value="{% if search and search.results.first.price %}{{ search.terms }}{% endif %}" autocapitalize="off" autocomplete="off" autocorrect="off" />
+              </form>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    {% if settings.size_chart != blank and template contains 'product' %}
+      {% render 'size-chart-popup' %}
+    {% endif %}
+
+    {% if settings.newsletter_popup %}
+      {% render 'newsletter-popup' %}
+    {% endif %}
+
+    {% if settings.disqus_enabled %}
+      {% if template contains "blog" or template contains "article" or template contains "index" %}
+        <script id="dsq-count-scr" src="//{{ settings.disqus_shortname }}.disqus.com/count.js" async></script>
+      {% endif %}
+    {% endif %}
+
+    <script src="//cdn.codeblackbelt.com/js/modules/frequently-bought-together/main.min.js?shop=bysofieofficial.myshopify.com" defer></script>
+
+    
+
+    <script>
+      window.addEventListener('DOMContentLoaded', function() {
+        // Parallax plugin initialized if there is a parallax banner added to the page
+        if ($('.parallax-banner').length > 0) {
+          new universalParallax().init({
+            speed: Shopify.media_queries.tablet.matches ? 10 : 4
+          })
+        }
+      });
+    </script>
+
+    {% render 'mobile-search' %}
+  <script>window.KlarnaThemeGlobals={};{%case template.name%} {%when"product"%} window.KlarnaThemeGlobals.data_purchase_amount={{product.first_available_variant.price}};window.KlarnaThemeGlobals.productVariants={{product.variants|json}};window.KlarnaThemeGlobals.documentCopy=document.cloneNode(true);{%when"cart"%} window.KlarnaThemeGlobals.data_purchase_amount={{cart.total_price}};window.KlarnaThemeGlobals.documentCopy=document.cloneNode(true);{%endcase%}</script>
+</body>
+</html>

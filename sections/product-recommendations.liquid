@@ -1,0 +1,129 @@
+{% comment %}
+** Product recommendations - dynamic **
+- Draggable section
+{% endcomment %}
+
+{% comment %} Content settings {% endcomment %}
+{%- assign heading = section.settings.product_recommendations_heading -%}
+{% comment %} End content settings {% endcomment %}
+
+{% comment %} NE compatibility {% endcomment %}
+{% comment %} This setting and conditional should be removed in the New Editor {% endcomment %}
+{% if section.settings.show_product_recommendations %}
+{% comment %} Ends NE compatibility {% endcomment %}
+
+{% comment %} Check whether product has any tags for custom related products {% endcomment %}
+{% for tag in product.tags %}
+  {% if tag contains 'meta-related-collection-' %}
+    {%- assign related_collection_handle = tag | remove: 'meta-related-collection-' -%}
+  {% endif %}
+{% endfor %}
+
+{% if related_collection_handle != blank %}
+  {% comment %} Show products based on merchant-added tags prepended with 'meta-related-collection-' {% endcomment %}
+  {%- assign collection_size = collections[related_collection_handle].all_products_count -%}
+
+  {% if collection_size > 0 %}
+    {%- assign custom_collection = collections[related_collection_handle] -%}
+    {%- assign products = custom_collection.products -%}
+  {% endif %}
+
+  {% if custom_collection and collection_size > 0 %}
+    {% if custom_collection.products.first.id != product.id %}
+      {%- assign show_custom_collection = true -%}
+    {% endif %}
+  {% endif %}
+{% else %}
+  {% comment %} Shopify generated dynamic recommendations, falling back to default related products (based on parent collection) {% endcomment %}
+  {%- assign dynamic_collection = recommendations -%}
+  {%- assign products = recommendations.products -%}
+  {%- assign show_dynamic_collection = true -%}
+{% endif %}
+
+{% comment %} HTML markup {% endcomment %}
+{% capture product_collections_markup %}
+  <div class="container">
+    <div class="one-whole column">
+      <h2 class="recommended-title title">{{ heading }}</h2>
+
+      {% if section.settings.show_divider %}
+        <div class="feature_divider"></div>
+      {% endif %}
+    </div>
+
+    {% render 'product-loop',
+            limit: limit,
+            products: products,
+            products_per_row: section.settings.products_per_row,
+            skip_product: product,
+            sidebar: sidebar
+    %}
+  </div>
+{% endcapture %}
+
+{% if show_custom_collection %}
+  {{ product_collections_markup }}
+{% elsif show_dynamic_collection %}
+  <div class="product-recommendations"
+       data-recommendations-url="{{ routes.product_recommendations_url }}"
+       data-product-id="{{ product.id }}"
+       data-limit="{{ section.settings.recommended_products_limit }}"
+       data-enabled="{{ section.settings.show_product_recommendations }}">
+    {{ product_collections_markup }}
+  </div>
+{% endif %}
+
+{% comment %} NE compatibility {% endcomment %}
+{% comment %} This setting and conditional should be removed in the New Editor {% endcomment %}
+{% endif %}
+{% comment %} Ends NE compatibility {% endcomment %}
+
+{% schema %}
+  {
+    "name": "Recommended products",
+    "class": "shopify-section--recommended-products",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Product recommendations"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_product_recommendations",
+        "label": "Show dynamic recommendations",
+        "info": "Dynamic recommendations change and improve with time. [Learn more](https://help.shopify.com/en/themes/development/recommended-products)",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "product_recommendations_heading",
+        "label": "Heading",
+        "default": "You may also like"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_divider",
+        "default": true,
+        "label": "Show divider"
+      },
+      {
+        "type": "range",
+        "id": "products_per_row",
+        "label": "Products per row",
+        "min": 2,
+        "max": 4,
+        "step": 1,
+        "default": 3
+      },
+      {
+        "type": "range",
+        "id": "recommended_products_limit",
+        "label": "Limit products",
+        "min": 2,
+        "max": 10,
+        "step": 1,
+        "default": 3
+      }
+    ]
+  }
+{% endschema %}

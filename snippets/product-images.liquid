@@ -1,0 +1,155 @@
+{% comment %}
+Required value for when product media enabled
+video_looping: <boolean>
+
+Optional
+---------
+set_product_height: <boolean>
+quickshop: <boolean>
+{% endcomment %}
+
+{% comment %} If within quickshop, reference theme settings instead {% endcomment %}
+{% if quickshop %}
+  {%- assign display_thumbnails = settings.display_thumbnails -%}
+  {%- assign thumbnail_position = settings.thumbnail_position -%}
+  {%- assign enable_thumbnail_slider = settings.enable_thumbnail_slider -%}
+  {%- assign gallery_arrows = settings.gallery_arrows -%}
+  {%- assign slideshow_transition = settings.slideshow_transition -%}
+{% else %}
+  {%- assign display_thumbnails = section.settings.display_thumbnails -%}
+  {%- assign thumbnail_position = section.settings.thumbnail_position -%}
+  {%- assign enable_thumbnail_slider = section.settings.enable_thumbnail_slider -%}
+  {%- assign gallery_arrows = section.settings.gallery_arrows -%}
+  {%- assign slideshow_transition = section.settings.slideshow_transition -%}
+{% endif %}
+
+<!-- {%- assign featured_image = product.selected_or_first_available_variant.featured_image | default: product.featured_image -%} -->
+{%- assign featured_image = product.selected_variant.featured_image | default: product.featured_image -%}
+
+<div class="product-gallery product-{{ product.id }}-gallery
+     {% if product-images == blank %}product_slider{% endif %}
+     {% if set_product_height != blank %}product-height-set{% endif %}
+     product-gallery__thumbnails--{{ display_thumbnails }}
+     product-gallery--{{ thumbnail_position }}
+     product-gallery--media-amount-{{ product.media.size }}
+     display-arrows--{{ gallery_arrows }}
+     slideshow-transition--{{ slideshow_transition }}">
+  <div class="product-gallery__main" data-media-count="{{ product.media.size }}"
+     data-video-looping-enabled="{{ video_looping }}">
+    {% for media in product.media %}
+      <div class="product-gallery__image {% if media.media_type contains 'video' %}video{% endif %}"
+           data-thumb="{{ media | img_url: '300x' }}"
+           data-title="{{ media.alt | escape }}"
+           data-media-type="{% if media.alt contains 'youtube' or media.alt contains 'vimeo' %}external_video{% else %}{{ media.media_type }}{% endif %}">
+        {% case media.media_type %}
+          {% when 'image' %}
+            {% if media.alt contains 'youtube' or media.alt contains 'vimeo' %}
+              {%- assign alt_text = media.alt | split: ' ' -%}
+              {% for property in alt_text %}
+                {% if property contains "src" %}
+                  {%- assign cleanURL = property | remove: 'src=' | remove: '&quot;' | remove: '"' -%}
+                    <div class="external-video__container" data-youtube-video>
+                      <iframe src="{{ cleanURL }}" frameborder="0"></iframe>
+                    </div>
+                {% endif %}
+              {% endfor %}
+            {% else %}
+
+              {% capture image_100x %}{{ media | img_url: '100x' }}{% endcapture %}
+              {% capture image_200x %}{{ media | img_url: '200x' }}{% endcapture %}
+              {% capture image_400x %}{{ media | img_url: '400x' }}{% endcapture %}
+              {% capture image_600x %}{{ media | img_url: '600x' }}{% endcapture %}
+              {% capture image_800x %}{{ media | img_url: '800x' }}{% endcapture %}
+              {% capture image_1200x %}{{ media | img_url: '1200x' }}{% endcapture %}
+              {% capture image_2000x %}{{ media | img_url: '2000x' }}{% endcapture %}
+              {% capture image_5000x %}{{ media | img_url: '5000x' }}{% endcapture %}
+
+              {% if context != 'modal' %}
+                <a href="{{ media | img_url: '2048x' }}"
+                  class="fancybox product-gallery__link"
+                  data-fancybox="{{ product.id }}"
+                  data-alt="{{ media.alt | escape }}"
+                  title="{{ media.alt | escape }}"
+                  tabindex="1">
+              {% endif %}
+                  {%- comment -%} Tidal Rise Bug Fixe - Changed data-image-id from product.images to product.media to allow for other media types in gallery i.e. video {%-endcomment-%}
+                  <div class="image__container">
+                    <img id="{{ media.id }}"
+                      class="lazyload lazyload--fade-in"
+                      alt="{{ media.alt | escape }}"
+                      data-zoom-src="{{ image_5000x }}"
+                      data-image-id="{{ product.media[forloop.index0].id }}" 
+                      data-index="{{ forloop.index0 }}"
+                      data-sizes="auto"
+                      data-srcset=" {{ image_200x }} 200w,
+                                    {{ image_400x }} 400w,
+                                    {{ image_600x }} 600w,
+                                    {{ image_800x }} 800w,
+                                    {{ image_1200x }} 1200w,
+                                    {{ image_2000x }} 2000w"
+                      data-aspectratio="{{ media.width }}/{{ media.height }}"
+                      height="{{ media.height }}"
+                      width="{{ media.width }}"
+                      srcset="data:image/svg+xml;utf8,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='{{ media.width }}'%20height='{{ media.height }}'></svg>"
+                      tabindex="-1">
+                  </div>
+              {% if context != 'modal' %}
+                </a>
+              {% endif %}
+            {% endif %}
+          {% when 'external_video' %}
+            <div class="external-video__container" data-youtube-video data-media-uploaded>
+              {{ media | external_video_tag }}
+            </div>
+          {% when 'video' %}
+            <div class="video__container" data-html5-video>
+              {{ media | video_tag: image_size: '300x300', controls: true }}
+            </div>
+          {% when 'model' %}
+            <div class="model__container">
+              {{ media | model_viewer_tag: image_size: '300x300', reveal: 'interaction', toggleable: true }}
+
+              <button class="action_button view-in-your-space" data-shopify-xr data-shopify-model3d-id="{% if media.media_type == 'model' %}{{ media.id }}{% else %}{{ has_model.id }}{% endif %}" data-shopify-title={{ product.title }} style="display: none;">
+                <svg width="33" height="33" viewBox="0 0 33 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M16 9L22.0622 12.5V19.5L16 23L9.93782 19.5V12.5L16 9Z" stroke="#3A3A3A" stroke-width="1.5"/>
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M16 23V15.6024C16.6225 15.2002 16.6225 15.2002 16.6225 15.2002L22 12V19.4082L16 23Z" fill="#3A3A3A"/>
+                </svg>
+                {{ 'products.product.view_in_your_space' | t | capitalize }}
+              </button>
+            </div>
+          {% else %}
+            {{ media | media_tag }}
+        {% endcase %}
+      </div>
+    {% endfor %}
+  </div>
+  {% comment %} Flickity Product Gallery Thumbnails {% endcomment %}
+  {% if display_thumbnails == true %}
+    {% if thumbnail_position != 'no-thumbnails' and product.media.size > 1 %}
+      <div class="product-gallery__thumbnails
+                  product-gallery__thumbnails--{{ thumbnail_position }}
+                  is-slide-nav--{{ enable_thumbnail_slider }}">
+
+        {% capture video_badge %}
+          <div class="media-badge"><svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M1 25H25V1H1V25Z" fill="white"/><path class="media-badge__outline" d="M0.5 25V25.5H1H25H25.5V25V1V0.5H25H1H0.5V1V25Z" stroke="black" stroke-opacity="0.05"/><path fill-rule="evenodd" clip-rule="evenodd" d="M8.19995 5.8V20.2L19.3999 12.5858L8.19995 5.8Z" fill="#3A3A3A" fill-opacity="0.6"/></svg></div>
+        {% endcapture %}
+        {% capture model_badge %}
+          <div class="media-badge"><svg viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M1 25H25V1H1V25Z" fill="white"/><path class="media-badge__outline" d="M0.5 25V25.5H1H25H25.5V25V1V0.5H25H1H0.5V1V25Z" stroke="black" stroke-opacity="0.05"/><g opacity="0.6"><path fill-rule="evenodd" clip-rule="evenodd" d="M13 6L19.0622 9.5V16.5L13 20L6.93782 16.5V9.5L13 6Z" stroke="#3A3A3A" stroke-width="1.5"/><path fill-rule="evenodd" clip-rule="evenodd" d="M13 20V12.6024C13.6225 12.2002 13.6225 12.2002 13.6225 12.2002L19 9V16.4082L13 20Z" fill="#3A3A3A"/></g></svg></div>
+        {% endcapture %}
+
+        {% for media in product.media %}
+          <div class="product-gallery__thumbnail" tabindex="0">
+            <img src="{{ media | img_url: '300x' }}" alt="{{ media.alt | escape }}">
+
+            {% comment %} Add media badge depending on media type {% endcomment %}
+            {% if media.media_type contains 'video' %}
+              {{ video_badge }}
+            {% elsif media.media_type contains 'model' %}
+              {{ model_badge }}
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endif %}
+</div>

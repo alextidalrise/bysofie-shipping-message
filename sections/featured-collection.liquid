@@ -1,0 +1,129 @@
+{% include 'include-featured-collection' %}
+
+{% schema %}
+  {
+    "name": "Featured collection",
+    "class": "shopify-section--featured-collection",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Featured collection"
+      },
+      {
+        "type": "collection",
+        "id": "frontpage_collection",
+        "label": "Collection"
+      },
+      {
+        "type": "header",
+        "content": "Products"
+      },
+      {
+        "type": "range",
+        "id": "frontpage_products_per_row",
+        "label": "Products per row",
+        "min": 2,
+        "max": 4,
+        "step": 1,
+        "default": 4
+      },
+      {
+        "type": "range",
+        "id": "frontpage_products_limit",
+        "label": "Limit products",
+        "min": 2,
+        "max": 50,
+        "step": 1,
+        "default": 12
+      },
+      {
+        "type": "select",
+        "id": "collection_style",
+        "label": "Layout",
+        "default": "grid",
+        "options": [
+          {
+            "value": "list",
+            "label": "List"
+          },
+          {
+            "value": "grid",
+            "label": "Grid"
+          }
+        ]
+      },
+      {
+        "type": "paragraph",
+        "content": "The following settings only apply to the List Layout"
+      },
+      {
+        "type": "select",
+        "id": "image_crop",
+        "label": "Image crop",
+        "default": "cover",
+        "options": [
+          {
+            "value": "cover",
+            "label": "Cover"
+          },
+          {
+            "value": "contain",
+            "label": "Contain"
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "id": "show_product_description",
+        "label": "Show product description",
+        "default": false
+      },
+      {
+        "type": "select",
+        "id": "truncated_words",
+        "label": "Product description truncated words",
+        "default": "10",
+        "options": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "10",
+            "label": "10"
+          },
+          {
+            "value": "15",
+            "label": "15"
+          },
+          {
+            "value": "20",
+            "label": "20"
+          },
+          {
+            "value": "25",
+            "label": "25"
+          },
+          {
+            "value": "30",
+            "label": "30"
+          },
+          {
+            "value": "35",
+            "label": "35"
+          },
+          {
+            "value": "40",
+            "label": "40"
+          }
+        ]
+      }
+    ],
+    "presets": [{
+      "name": "Featured collection",
+      "category": "Collection"
+    }]
+  }
+{% endschema %}

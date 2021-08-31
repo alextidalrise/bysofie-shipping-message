@@ -1,0 +1,23 @@
+async function load() {
+  let url = 'https://bysofieofficial.com/browsing_context_suggestions.json';
+  let obj = await (await fetch(url)).json();
+  var country = obj.detected_values.country_name;
+  if (country != 'United Kingdom') {
+    $('#non-uk-shipping-notice').removeClass('is-hidden');
+    $('.shipping-notice').removeClass('is-invisible');
+  } else {
+    $('#uk-shipping-notice').removeClass('is-hidden');
+    $('.shipping-notice').removeClass('is-invisible');
+  }
+}
+
+load();
+
+var elements = document.querySelectorAll('#shipping-link');
+elements.forEach(function(e) {
+  e.addEventListener("click", function() {
+    document.querySelectorAll("a[id='shipping']")[0].click();
+    var element_to_scroll_to = document.querySelectorAll('.tabs')[0];
+    element_to_scroll_to.scrollIntoView({behavior: "smooth", block: "center", inline: "nearest"})
+  });
+})

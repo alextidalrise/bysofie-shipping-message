@@ -1,0 +1,263 @@
+{% include 'include-video' %}
+
+{% schema %}
+  {
+    "name": "Video",
+    "class": "shopify-section--video under-menu parallax-banner",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Video"
+      },
+      {
+        "type": "checkbox",
+        "id": "wide_display",
+        "label": "Wide display",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "aspect_ratio",
+        "label": "Aspect ratio",
+        "default": "16:9",
+        "options": [
+          {
+            "value": "16:9",
+            "label": "16:9"
+          },
+          {
+            "value": "4:3",
+            "label": "4:3"
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "id": "autoplay",
+        "label": "Autoplay video",
+        "default": false,
+        "info": "Limited browser support for autoplaying video [Learn more](https:\/\/help.outofthesandbox.com\/hc\/en-us\/articles\/360000661568-Why-won-t-my-video-autoplay-)"
+      },
+      {
+        "type": "checkbox",
+        "id": "autoloop",
+        "label": "Autoloop video",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "mute_video",
+        "label": "Mute video",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "video_controls",
+        "label": "Show video controls",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "video_dark_overlay",
+        "label": "Darken video",
+        "default": false
+      },
+      {
+        "type": "video_url",
+        "id": "iframe_video",
+        "label": "Video link",
+        "accept": ["youtube", "vimeo"],
+        "default": "https://www.youtube.com/watch?v=_9VUPq3SxOc"
+      },
+      {
+        "type": "text",
+        "id": "html5_video",
+        "label": "HTML5 MP4/OGV File URL"
+      },
+      {
+        "type": "checkbox",
+        "id": "display_text_over_video",
+        "label": "Show text when video is playing",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Content"
+      },
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image",
+        "info": "1600 x 900px recommended"
+      },
+      {
+        "type": "select",
+        "id": "image_focal_point",
+        "label": "Image focal point",
+        "info": "Used to keep the subject of your photo in view. On mobile, only applies to cropped images.",
+        "default": "center center",
+        "options": [
+          {
+            "value": "20% 0",
+            "label": "Top left"
+          },
+          {
+            "value": "top center",
+            "label": "Top center"
+          },
+          {
+            "value": "80% 0",
+            "label": "Top right"
+          },
+          {
+            "value": "20% 50%",
+            "label": "Left"
+          },
+          {
+            "value": "center center",
+            "label": "Center"
+          },
+          {
+            "value": "80% 50%",
+            "label": "Right"
+          },
+          {
+            "value": "20% 100%",
+            "label": "Bottom left"
+          },
+          {
+            "value": "bottom center",
+            "label": "Bottom center"
+          },
+          {
+            "value": "80% 100%",
+            "label": "Bottom right"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "headline_animation",
+        "label": "Text animation",
+        "options": [
+          {
+            "value": "",
+            "label": "None"
+          },
+          {
+            "value": "animate_in",
+            "label": "Fade In"
+          },
+          {
+            "value": "animate_up",
+            "label": "Fade Up"
+          },
+          {
+            "value": "animate_down",
+            "label": "Fade Down"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Your headline here"
+      },
+      {
+        "type": "richtext",
+        "id": "subtitle",
+        "label": "Text",
+        "default": "<p>This is a short subheading for your banner image</p>"
+      },
+      {
+        "type": "text",
+        "id": "button_label",
+        "label": "Button label",
+        "default": "Play video"
+      },
+      {
+        "type": "url",
+        "id": "link",
+        "label": "Button link"
+      },
+      {
+        "type": "select",
+        "id": "text_position",
+        "label": "Text position",
+        "default": "center center",
+        "options": [
+          {
+            "value": "left top",
+            "label": "Top left"
+          },
+          {
+            "value": "center top",
+            "label": "Top center"
+          },
+          {
+            "value": "right top",
+            "label": "Top right"
+          },
+          {
+            "value": "left center",
+            "label": "Left"
+          },
+          {
+            "value": "center center",
+            "label": "Center"
+          },
+          {
+            "value": "right center",
+            "label": "Right"
+          },
+          {
+            "value": "left bottom",
+            "label": "Bottom left"
+          },
+          {
+            "value": "center bottom",
+            "label": "Bottom center"
+          },
+          {
+            "value": "right bottom",
+            "label": "Bottom right"
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "id": "homepage_arrow",
+        "label": "Show scroll down arrow",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Parallax"
+      },
+      {
+        "type": "checkbox",
+        "id": "parallax_effect",
+        "label": "Enable parallax scrolling",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "parallax_image_height",
+        "label": "Parallax section height",
+        "min": 300,
+        "max": 1000,
+        "step": 20,
+        "default": 600,
+        "unit": "px"
+      }
+    ],
+    "presets": [{
+      "name": "Video",
+      "category": "Video",
+      "settings": {
+        "iframe_video": "https://www.youtube.com/watch?v=_9VUPq3SxOc"
+      }
+    }]
+  }
+{% endschema %}

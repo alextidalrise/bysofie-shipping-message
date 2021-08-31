@@ -1,0 +1,178 @@
+{% comment %}
+** Featured promotions - dynamic **
+- Draggable section
+- Uses blocks
+{% endcomment %}
+
+{% comment %} Content settings {% endcomment %}
+{%- assign blocks = section.blocks -%}
+{% comment %} End content settings {% endcomment %}
+
+{% if section.blocks.size > 0 %}
+  <section class="section featured-promotions">
+    <div class="container">
+      {% for block in blocks %}
+        {% comment %} Content settings {% endcomment %}
+        {%- assign image = block.settings.image -%}
+        {% comment %} End content settings {% endcomment %}
+
+        <div class="featured-promotions__item column medium-down--one-whole {% render 'column-width', value: section.settings.featured_promos_per_row %} {% if section.settings.featured_links_style != blank %}{{ section.settings.featured_links_style }} {% cycle 'delay-025s', 'delay-05s', 'delay-075s', 'delay-1s' %}{% endif %}">
+          {% if block.settings.link != blank %}
+            <a href="{{ block.settings.link }}" class="featured-promotions__link">
+          {% endif %}
+
+          <div class="featured-promotions__image featured-promotions__image-rounded-{{ section.settings.rounded_image }}">
+            {% if image != blank %}
+              {% render 'image-element',
+                      image: image,
+                      alt: image.alt,
+              %}
+            {% else %}
+              {% capture i %}{% cycle "1", "2", "3", "4", "5", "6" %}{% endcapture %}
+              {{ 'collection-' | append: i | placeholder_svg_tag: 'placeholder-svg placeholder-svg--promotions' }}
+            {% endif %}
+          </div>
+
+          {% if block.settings.title != blank %}
+            <h2 class="featured-promotions__title">{{ block.settings.title | escape }}</h2>
+
+            {% if section.settings.show_divider %}
+              <div class="feature_divider"></div>
+            {% endif %}
+          {% endif %}
+
+          {% if block.settings.link != blank %}
+            </a>
+          {% endif %}
+
+          {% if block.settings.text != blank %}
+            <div class="featured-promotions__text">
+              {{ block.settings.text }}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}
+
+{% schema %}
+  {
+    "name": "Featured promotions",
+    "class": "shopify-section--featured-promotions",
+    "max_blocks": 4,
+    "settings": [
+      {
+        "type": "range",
+        "id": "featured_promos_per_row",
+        "label": "Promotions per row",
+        "min": 2,
+        "max": 4,
+        "step": 1,
+        "default": 3
+      },
+      {
+        "type": "select",
+        "id": "featured_links_style",
+        "label": "Animation",
+        "default": "animate_down",
+        "options": [
+          {
+            "value": "",
+            "label": "None"
+          },
+          {
+            "value": "animate_in",
+            "label": "Fade In"
+          },
+          {
+            "value": "animate_up",
+            "label": "Fade Up"
+          },
+          {
+            "value": "animate_down",
+            "label": "Fade Down"
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "id": "rounded_image",
+        "label": "Rounded images",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "show_divider",
+        "default": true,
+        "label": "Show divider"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "image",
+        "name": "Promotion",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image",
+            "info": "840px wide recommended"
+          },
+          {
+            "type": "url",
+            "id": "link",
+            "label": "Link"
+          },
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Heading",
+            "default": "Promotion"
+          },
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>This is a featured promotion block, add some text here to talk about your promotion.</p>"
+          }
+        ]
+      }
+    ],
+    "presets": [{
+      "name": "Featured promotions",
+      "category": "Image",
+      "settings": {
+      },
+      "blocks": [
+        {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "link": "",
+            "title": "Promotion",
+            "text": "<p>This is a featured promotion block, add some text here to talk about your promotion.</p>"
+          }
+        },
+        {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "link": "",
+            "title": "Promotion",
+            "text": "<p>This is a featured promotion block, add some text here to talk about your promotion.</p>"
+          }
+        },
+        {
+          "type": "image",
+          "settings": {
+            "image": "",
+            "link": "",
+            "title": "Promotion",
+            "text": "<p>This is a featured promotion block, add some text here to talk about your promotion.</p>"
+          }
+        }
+      ]
+    }]
+  }
+{% endschema %}

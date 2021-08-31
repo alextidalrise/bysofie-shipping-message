@@ -1,0 +1,73 @@
+{% comment %}
+** Rich text - dynamic **
+- Draggable section
+{% endcomment %}
+
+{% comment %} Assign object as block or section {% endcomment %}
+{% if type == 'block' %}
+  {%- assign object = block -%}
+{% else %}
+  {%- assign object = section -%}
+{% endif %}
+
+{% comment %} Content settings {% endcomment %}
+{%- assign title = object.settings.title | escape -%}
+{%- assign content = object.settings.content -%}
+{%- assign image = object.settings.image -%}
+{%- assign logo_width = object.settings.logo_width %}
+{%- assign button_label = object.settings.button_label -%}
+{%- assign button_link = object.settings.button_link -%}
+{% comment %} End content settings {% endcomment %}
+
+<section class="section section--{{ section.id }}">
+  <div class="container">
+    <div class="one-whole column {{ object.settings.text_alignment }}">
+
+      {% if image != blank %}
+        {% render 'image-element',
+                image: image,
+                alt: image.alt
+        %}
+      {% endif %}
+      
+      {% if title != blank %}
+        <h2 class="title {{ object.settings.text_alignment }}">{{ title }}</h2>
+        {% if object.settings.show_divider %}
+          <div class="feature_divider"></div>
+        {% endif %}
+      {% endif %}
+
+      {% if content != blank %}
+        <div class="richtext_content--{{ object.settings.text_size }} {{ object.settings.text_alignment }}">
+          {{ content }}
+        </div>
+      {% endif %}
+
+      {% if button_label != blank %}
+        <p>
+          <a {% if button_link != blank %}href="{{ button_link }}"{% endif %} class="action_button">{{ button_label | escape }}</a>
+        </p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section--{{ section.id }} img {
+    max-width: {{ logo_width }}px;
+  }
+  .section--{{ section.id }} h2 {
+    font-size: 29px;
+    text-transform: none;
+  }
+  @media only screen and (max-width: 798px) {
+    .section--{{ section.id }} h2 {
+      font-size: 22px;
+  	}
+  }
+  .section--{{ section.id }} .image-element__wrap {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 16px;
+  }
+</style>

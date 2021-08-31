@@ -1,0 +1,268 @@
+{% if section.settings.image != blank %}
+  {%- assign feature_image = true -%}
+  {%- assign text_position = section.settings.text_position | split: ' ' -%}
+
+  {% capture banner_text %}
+    <div class="container banner__text text-align--{{ text_position[0] }}">
+      {% if section.settings.link != blank and section.settings.button_label == blank %}
+        <a href="{{ section.settings.link }}" class="full-link">
+          {{ section.settings.link }}
+        </a>
+      {% endif %}
+
+      <div class="banner__inner-text {{ section.settings.headline_animation }}">
+        {% if section.settings.title != blank %}
+          <h1 class="headline">{{ section.settings.title | escape }}</h1>
+        {% else %}
+          <h1 class="headline">{{ page.title }}</h1>
+        {% endif %}
+
+        {% if section.settings.subtitle != blank %}
+          <div class="subtitle">
+            {{ section.settings.subtitle }}
+          </div>
+        {% endif %}
+
+        {% if section.settings.button_label != blank %}
+          <a {% if section.settings.link != blank %}href="{{ section.settings.link }}"{% endif %} class="action_button">
+            {{ section.settings.button_label | escape }}
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  {% endcapture %}
+
+  <div id="banner-{{ section.id }}" class="featured-image--{{ feature_image }}
+    darken-image-{{ section.settings.darken_image }}
+    mobile-parallax-enabled--{{ settings.enable_mobile_parallax }} mobile-image-crop-enabled--{{ settings.slideshow_images_crop }}">
+      {% if section.settings.parallax_effect %}
+        <div class="parallax__wrap horizontal-text-position--{{ text_position[0] }} vertical-text-position--{{ text_position[1] }}">
+          {{ banner_text }}
+
+          <div class="parallax" data-parallax-image="{{ section.settings.image | img_url: '2048x' }}">
+            <noscript>
+              <img src="{{ section.settings.image | img_url: '2000x' }}" alt="{{ alt | escape }}" class="image__fallback">
+            </noscript>
+          </div>
+
+          <img alt
+            class="mobile-placeholder-svg"
+            src="data:image/svg+xml;utf8,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='{{ section.settings.image.width }}'%20height='{{ section.settings.image.height }}'></svg>"/>
+        </div>
+      {% else %}
+        <div class="banner__wrap">
+          <div class="banner horizontal-text-position--{{ text_position[0] }} vertical-text-position--{{ text_position[1] }}">
+            {{ banner_text }}
+          </div>
+
+          {% if section.settings.image != blank %}
+            <div class="banner__image-wrapper">
+              {% render 'image-element',
+                      image: section.settings.image,
+                      alt: section.settings.image.alt,
+                      stretch_width: true
+              %}
+            </div>
+          {% else %}
+            <img src="{{ 'placeholder.svg' | asset_url }}"/>
+          {% endif %}
+        </div>
+      {% endif %}
+  </div>
+{% endif %}
+
+<section class="section">
+  <div class="container {% if section.settings.image == blank %}content{% endif %} main-wrapper page">
+    {% if section.settings.image == blank %}
+      <div class="one-whole column">
+        <h1 class="center">{{ page.title }}</h1>
+        <div class="feature_divider"></div>
+      </div>
+    {% endif %}
+
+    {{ page.content }}
+  </div>
+</section>
+
+<style>
+  {% if section.settings.parallax_effect %}
+    #banner-{{ section.id }} .parallax__wrap,
+    #banner-{{ section.id }} .parallax__container .parallax {
+      height: {{ section.settings.parallax_image_height }}px;
+    }
+  {% endif %}
+
+  #banner-{{ section.id }} .parallax__container .parallax {
+    background-position: {{ section.settings.image_focal_point}} !important;
+  }
+
+  #banner-{{ section.id }} .banner__wrap img {
+    object-position: {{ section.settings.image_focal_point }};
+    -o-object-position: {{ section.settings.image_focal_point }};
+  }
+
+  @media only screen and (max-width: 798px) {
+    {% if settings.slideshow_images_crop or section.settings.parallax_effect and settings.enable_mobile_parallax %}
+      #banner-{{ section.id }} .banner__wrap,
+      #banner-{{ section.id }} .parallax__wrap,
+      #banner-{{ section.id }} .parallax__container .parallax {
+        height: {{ section.settings.parallax_image_height | divided_by: 2 }}px;
+      }
+    {% else %}
+      #banner-{{ section.id }} .banner__wrap,
+      #banner-{{ section.id }} .parallax__wrap {
+        height: auto;
+      }
+    {% endif %}
+  }
+</style>
+
+{% schema %}
+  {
+    "name": "Banner",
+    "class": "shopify-section--page-banner-template parallax-banner",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "Image",
+        "info": "1600 x 1000px recommended"
+      },
+      {
+        "type": "select",
+        "id": "image_focal_point",
+        "label": "Image focal point",
+        "info": "Used to keep the subject of your photo in view. On mobile, only applies to cropped images.",
+        "default": "center center",
+        "options": [
+          {
+            "value": "20% 0",
+            "label": "Top left"
+          },
+          {
+            "value": "top center",
+            "label": "Top center"
+          },
+          {
+            "value": "80% 0",
+            "label": "Top right"
+          },
+          {
+            "value": "20% 50%",
+            "label": "Left"
+          },
+          {
+            "value": "center center",
+            "label": "Center"
+          },
+          {
+            "value": "80% 50%",
+            "label": "Right"
+          },
+          {
+            "value": "20% 100%",
+            "label": "Bottom left"
+          },
+          {
+            "value": "bottom center",
+            "label": "Bottom center"
+          },
+          {
+            "value": "80% 100%",
+            "label": "Bottom right"
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "id": "darken_image",
+        "label": "Darken banner image",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading"
+      },
+      {
+        "type": "richtext",
+        "id": "subtitle",
+        "label": "Subheading"
+      },
+      {
+        "type": "text",
+        "id": "button_label",
+        "label": "Button label"
+      },
+      {
+        "type": "url",
+        "id": "link",
+        "label": "Link"
+      },
+      {
+        "type": "select",
+        "id": "text_position",
+        "label": "Text position",
+        "default": "center center",
+        "options": [
+          {
+            "value": "left top",
+            "label": "Top left"
+          },
+          {
+            "value": "center top",
+            "label": "Top center"
+          },
+          {
+            "value": "right top",
+            "label": "Top right"
+          },
+          {
+            "value": "left center",
+            "label": "Left"
+          },
+          {
+            "value": "center center",
+            "label": "Center"
+          },
+          {
+            "value": "right center",
+            "label": "Right"
+          },
+          {
+            "value": "left bottom",
+            "label": "Bottom left"
+          },
+          {
+            "value": "center bottom",
+            "label": "Bottom center"
+          },
+          {
+            "value": "right bottom",
+            "label": "Bottom right"
+          }
+        ]
+      },
+      {
+        "type": "header",
+        "content": "Parallax"
+      },
+      {
+        "type": "checkbox",
+        "id": "parallax_effect",
+        "label": "Enable parallax scrolling",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "parallax_image_height",
+        "label": "Parallax section height",
+        "min": 300,
+        "max": 1000,
+        "step": 20,
+        "default": 400,
+        "unit": "px"
+      }
+    ]
+  }
+{% endschema %}

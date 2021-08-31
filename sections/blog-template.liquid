@@ -1,0 +1,571 @@
+{% comment %}
+** Main blog page - main content area **
+- Template section
+{% endcomment %}
+
+{% comment %} Check to see if sidebar should be enabled {% endcomment %}
+{% if section.blocks.size > 0 %}
+  {%- assign sidebar = true -%}
+{% else %}
+  {%- assign sidebar = false -%}
+{% endif %}
+
+{% if section.settings.image != blank %}
+  {%- assign feature_image = true -%}
+  {%- assign text_position = section.settings.text_position | split: ' ' -%}
+
+  {% capture banner_text %}
+    <div class="container banner__text text-align--{{ text_position[0] }}">
+      <div class="banner__inner-text">
+        {% if current_tags %}
+          <h1 class="headline">
+            {{ current_tags }}
+          </h1>
+        {% else %}
+          {% if section.settings.image_blog_headline != blank %}
+            <h1 class="headline">
+              {{ section.settings.image_blog_headline }}
+            </h1>
+          {% endif %}
+          {% if section.settings.image_blog_subtitle != blank %}
+            <div class="subtitle">
+              {{ section.settings.image_blog_subtitle }}
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  {% endcapture %}
+
+  <div id="banner-{{ section.id }}" class="featured-image--{{ feature_image }}
+    darken-image-{{ section.settings.darken_image }}
+    mobile-parallax-enabled--{{ settings.enable_mobile_parallax }} mobile-image-crop-enabled--{{ settings.slideshow_images_crop }}">
+    {% if section.settings.parallax_effect %}
+      <div class="parallax__wrap horizontal-text-position--{{ text_position[0] }} vertical-text-position--{{ text_position[1] }}">
+        {{ banner_text }}
+        <div class="parallax" data-parallax-image="{{ section.settings.image | img_url: '2048x' }}">
+          <noscript>
+            <img src="{{ section.settings.image | img_url: '2000x' }}" alt="{{ alt | escape }}" class="image__fallback">
+          </noscript>
+        </div>
+        <img alt
+          class="mobile-placeholder-svg"
+          src="data:image/svg+xml;utf8,<svg%20xmlns='http://www.w3.org/2000/svg'%20width='{{ section.settings.image.width }}'%20height='{{ section.settings.image.height }}'></svg>"/>
+      </div>
+    {% else %}
+      <div class="banner__wrap">
+        <div class="banner horizontal-text-position--{{ text_position[0] }} vertical-text-position--{{ text_position[1] }}">
+          {{ banner_text }}
+        </div>
+        {% if section.settings.image != blank %}
+          <div class="banner__image-wrapper">
+            {% render 'image-element',
+                      image: section.settings.image,
+                      alt: section.settings.image.alt,
+                      stretch_width: true
+            %}
+          </div>
+        {% else %}
+          <img src="{{ 'placeholder.svg' | asset_url }}"/>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+{% endif %}
+
+<section class="section">
+  <div class="container content main-wrapper">
+    {% paginate blog.articles by section.settings.blog_posts_per_page %}
+      {% unless section.settings.image %}
+        <div class="one-whole column">
+          <h1 class="center">
+            {% if current_tags %}
+              <a href="/blogs/{{ blog.handle }}/tagged/{{ current_tags | handleize }}" title="{{ blog.title | escape }}">{{ current_tags }}</a>
+            {% else %}
+              <a href="{{ blog.url }}" title="{{ blog.title | escape }}">{{ blog.title }}</a>
+            {% endif %}
+          </h1>
+          <div class="blog-subtitle">{{ section.settings.image_blog_subtitle }}</div>
+          <div class="feature_divider"></div>
+        </div>
+      {% endunless %}
+
+      {% if section.settings.blog_breadcrumb %}
+        <div class="three-fourths columns medium-down--one-whole breadcrumb breadcrumb--text">
+          <a href="{{ shop.url }}" title="{{ shop.name | escape }}">{{ 'general.breadcrumbs.home' | t }}</a>
+
+          &nbsp;<span class="icon-arrow-right"></span>
+
+          <a href="{{ blog.url }}" title="{{ blog.title | escape }}">{{ blog.title }}</a>
+
+          {% if current_tags %}
+            {% for tag in current_tags %}
+              &nbsp;<span class="icon-arrow-right"></span>
+              <a href="/blogs/{{ blog.handle }}/tagged/{{ tag | handleize }}" title="{{ tag | escape }}">{{ tag }}</a>
+            {% endfor %}
+          {% endif %}
+
+          {% if paginate.pages != 0 %}
+            &nbsp;<span class="icon-arrow-right"></span> {{ 'general.breadcrumbs.page' | t: current_page: paginate.current_page, pages: paginate.pages }}
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if section.settings.blog_tags %}
+        <div class="one-fourth column medium-down--one-whole section_select">
+          <select name="tag_filter" id="tag_filter" class="blog_filter">
+            <option {% unless current_tags %}selected="selected"{% endunless %} value="{{ blog.url }}">{{ 'blogs.general.view_all' | t }}</option>
+            {% for tag in blog.all_tags %}
+              <option {% if current_tags contains tag %}selected="selected"{% endif %} value="/blogs/{{ blog.handle }}/tagged/{{ tag | handleize }}">{{ tag }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "itemListElement": [
+            {% for article in blog.articles %}
+              {
+                "@type": "ListItem",
+                "position": "{{ forloop.index | json }}",
+                "url": "{{ shop.url }}{{ article.url }}",
+                "name": "{{ article.title }}"
+              } {%- unless forloop.last -%},{%- endunless -%}
+            {% endfor %}
+          ]
+        }
+      </script>
+
+    <div class="content-wrapper is-flex is-flex-wrap">
+      <div class="has-sidebar-option sidebar-enabled--{{ sidebar }}">
+        <div class="container">
+          {% for article in blog.articles %}
+            {% if section.settings.blog_posts_per_row == 1 %}
+              {% if article.image != blank %}
+                <div class="one-whole column article_image">
+                  <a href="{{ article.url }}" title="{{ article.title | escape }}">
+                    {% render 'image-element',
+                            image: article.image,
+                            alt: article.image.alt,
+                    		additional_classes: 'article-main-image'
+                    %}
+                  </a>
+                </div>
+                <div class="one-whole column article">
+              {% else %}
+                <div class="one-whole column article">
+              {% endif %}
+            {% else %}
+              <div class="{% render 'column-width', value: section.settings.blog_posts_per_row %} column medium-down--one-whole article">
+                {% if article.image != blank %}
+                  <a href="{{ article.url }}" title="{{ article.title | escape }}">
+                    {% render 'image-element',
+                            image: article.image,
+                            alt: article.image.alt
+                    %}
+                  </a>
+                {% endif %}
+            {% endif %}
+
+              {% if section.settings.blog_tags %}
+                <div class="blog_meta tags">
+                  {% for tag in article.tags %}
+                    <span><a href="{{ shop.url }}/blogs/{{ blog.handle }}/tagged/{{ tag | handleize }}" title="{{ blog.title }} {{ 'blogs.general.tagged' | t }} {{ tag | escape }}">{{ tag }}</a></span>
+                  {% endfor %}
+                </div>
+              {% endif %}
+
+              <h2 class="article_list_title"><a href="{{ article.url }}">{{ article.title }}</a></h2>
+
+              <p class="blog_meta">
+                {% if section.settings.blog_author %}
+                  <span>{{ 'blogs.article.by_author' | t: author: article.author }}</span>
+                {% endif %}
+
+                {% if section.settings.blog_date %}
+                  <span>{{ article.published_at | date: format: "month_day_year" }}</span>
+                {% endif %}
+
+                {% if section.settings.blog_comment_count %}
+                  {% if settings.disqus_enabled %}
+                    <span>
+                      <a href="{{ article.url }}#disqus_thread" data-disqus-identifier="{{ article.id }}" class="disqus-comment-count">{{ 'blogs.counts.comments_with_count' | t: count: 0 }}</a>
+                    </span>
+                  {% elsif article.comments_enabled? and article.comments_count > 0 %}
+                    <span>
+                      <a href="{{ article.url }}#comments">{{ 'blogs.counts.comments_with_count' | t: count: article.comments_count }}</a>
+                    </span>
+                  {% endif %}
+                {% endif %}
+              </p>
+
+              {% if article.excerpt != blank %}
+                  {%- assign postexcerpt = article.excerpt | size -%}
+                  {% if postexcerpt > 100 %}
+                    {%- assign excerptlength = 'lg' -%}
+                  {% elsif postexcerpt <= 50 %}
+                    {%- assign excerptlength = 'sm' -%}
+                  {% endif %}
+                  <div class="excerpt excerpt-length--{{ excerptlength }} {{ postexcerpt }}">
+                    {{ article.excerpt }}
+                    <span class="truncation-fade"></span>
+                  </div>
+              {% endif %}
+              {% if section.settings.read_more_link %}
+                <p>
+<!--              <a href="{{ article.url }}" title="{{ article.title | escape }}">{{ 'blogs.general.continue_reading_html' | t }} <span class="icon-arrow-right"></span></a> -->
+                  <a href="{{ article.url }}" class="action_button" title="{{ article.title | escape }}">{{ 'blogs.general.continue_reading_html' | t }}</a>
+                </p>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% render 'blog-sidebar',
+              context: 'blog',
+              blog_handle: blog.handle
+      %}
+
+      <br />
+
+      {% render 'pagination', paginate: paginate %}
+    {% endpaginate %}
+    </div>
+  </div>
+</section>
+
+
+<style>
+  {% if section.settings.parallax_effect %}
+    #banner-{{ section.id }} .parallax__wrap,
+    #banner-{{ section.id }} .parallax__container .parallax {
+      height: {{ section.settings.parallax_image_height }}px;
+    }
+  {% endif %}
+
+  #banner-{{ section.id }} .parallax__container .parallax {
+    background-position: {{ section.settings.image_focal_point}} !important;
+  }
+
+  #banner-{{ section.id }} .banner__wrap img {
+    object-position: {{ section.settings.image_focal_point }};
+    -o-object-position: {{ section.settings.image_focal_point }};
+  }
+
+  @media only screen and (max-width: 798px) {
+    {% if settings.slideshow_images_crop or section.settings.parallax_effect and settings.enable_mobile_parallax %}
+      #banner-{{ section.id }} .banner__wrap,
+      #banner-{{ section.id }} .parallax__wrap,
+      #banner-{{ section.id }} .parallax__container .parallax {
+        height: {{ section.settings.parallax_image_height | divided_by: 2 }}px;
+      }
+    {% else %}
+      #banner-{{ section.id }} .banner__wrap,
+      #banner-{{ section.id }} .parallax__wrap {
+        height: auto;
+      }
+    {% endif %}
+  }
+
+  {% if section.settings.image %}
+    div.content {
+      padding: 0;
+    }
+  {% endif %}
+</style>
+
+{% schema %}
+
+{
+  "name": "Blog",
+  "class": "shopify-section--blog-template parallax-banner",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "blog_breadcrumb",
+      "label": "Show breadcrumb links"
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_tags",
+      "label": "Show tag filter"
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_author",
+      "label": "Show author"
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_date",
+      "label": "Show date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "blog_comment_count",
+      "label": "Show comment count",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "read_more_link",
+      "label": "Show continue reading link",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "blog_posts_per_row",
+      "label": "Blog posts per row",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "blog_posts_per_page",
+      "label": "Blog posts per page",
+      "min": 1,
+      "max": 50,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Banner image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image",
+      "info": "1600 x 1000px recommended"
+    },
+    {
+      "type": "select",
+      "id": "image_focal_point",
+      "label": "Image focal point",
+      "info": "Used to keep the subject of your photo in view. On mobile, only applies to cropped images.",
+      "default": "center center",
+      "options": [
+        {
+          "value": "20% 0",
+          "label": "Top left"
+        },
+        {
+          "value": "top center",
+          "label": "Top center"
+        },
+        {
+          "value": "80% 0",
+          "label": "Top right"
+        },
+        {
+          "value": "20% 50%",
+          "label": "Left"
+        },
+        {
+          "value": "center center",
+          "label": "Center"
+        },
+        {
+          "value": "80% 50%",
+          "label": "Right"
+        },
+        {
+          "value": "20% 100%",
+          "label": "Bottom left"
+        },
+        {
+          "value": "bottom center",
+          "label": "Bottom center"
+        },
+        {
+          "value": "80% 100%",
+          "label": "Bottom right"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "darken_image",
+      "label": "Darken banner image",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "image_blog_headline",
+      "label": "Heading",
+      "default": "My blog"
+    },
+    {
+      "type": "richtext",
+      "id": "image_blog_subtitle",
+      "label": "Subheading",
+      "default": "<p>This is a subheading for your blog page</p>"
+    },
+    {
+      "type": "select",
+      "id": "text_position",
+      "label": "Text position",
+      "default": "center center",
+      "options": [
+        {
+          "value": "left top",
+          "label": "Top left"
+        },
+        {
+          "value": "center top",
+          "label": "Top center"
+        },
+        {
+          "value": "right top",
+          "label": "Top right"
+        },
+        {
+          "value": "left center",
+          "label": "Left"
+        },
+        {
+          "value": "center center",
+          "label": "Center"
+        },
+        {
+          "value": "right center",
+          "label": "Right"
+        },
+        {
+          "value": "left bottom",
+          "label": "Bottom left"
+        },
+        {
+          "value": "center bottom",
+          "label": "Bottom center"
+        },
+        {
+          "value": "right bottom",
+          "label": "Bottom right"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Parallax"
+    },
+    {
+      "type": "checkbox",
+      "id": "parallax_effect",
+      "label": "Enable parallax scrolling",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "parallax_image_height",
+      "label": "Parallax section height",
+      "min": 300,
+      "max": 1000,
+      "step": 20,
+      "default": 400,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Sidebar"
+    },
+    {
+      "type": "paragraph",
+      "content": "Create a sidebar by adding content blocks."
+    },
+    {
+      "type": "checkbox",
+      "id": "toggle",
+      "label": "Toggle sidebar content",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "post_tags",
+      "name": "Blog post tags",
+      "limit": 1
+    },
+    {
+      "type": "menu",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "link_list",
+          "id": "custom_menu_linklist",
+          "label": "Menu"
+        }
+      ]
+    },
+    {
+      "type": "newsletter",
+      "name": "Newsletter sign up form",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "display_first_name",
+          "label": "Show first name"
+        },
+        {
+          "type": "checkbox",
+          "id": "display_last_name",
+          "label": "Show last name"
+        },
+        {
+          "type": "richtext",
+          "id": "newsletter_richtext",
+          "label": "Text"
+        }
+      ]
+    },
+    {
+      "type": "page",
+      "name": "Page",
+      "settings": [
+        {
+          "type": "page",
+          "id": "content_page",
+          "label": "Page"
+        }
+      ]
+    },
+    {
+      "type": "recent_posts",
+      "name": "Recent blog posts",
+      "limit": 1
+    },
+    {
+      "type": "search",
+      "name": "Search form",
+      "limit": 1
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Heading"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Text area can be used for details about blog authors or general information.</p>"
+        }
+      ]
+    }
+  ]
+}
+
+{% endschema %}

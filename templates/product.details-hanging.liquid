@@ -1,0 +1,14 @@
+{% comment %}
+  The contents of the product.details-hanging.liquid template can be found in /sections/product-details-hanging-template.liquid
+{% endcomment %}
+
+{% render 'product-structured-data' %}
+
+{% section 'product-details-hanging-template' %}
+
+<section class="section">
+    <div class="container">
+      {% render 'judgeme_widgets', widget_type: 'judgeme_review_widget', concierge_install: false, product: product %}
+    </div>
+	{% section 'product-recommendations' %}
+</section>

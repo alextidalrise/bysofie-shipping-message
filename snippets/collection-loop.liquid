@@ -1,0 +1,56 @@
+{%- assign collection_group_mobile = linklist.handle -%}
+
+{% for link in linklist.links %}
+  {% comment %}
+  This section supports linking to collections, products, pages, and blogs. It will use the first image found in the page content or blog article.
+  {% endcomment %}
+
+  {%- assign link_item = link.object -%}
+  {%- assign link_image = '' -%}
+
+  {% capture link_title %}{{ link.title | escape }}{% endcapture %}
+
+  {% if link.type == 'collection_link' %}
+    {% if link_item.image %}
+      {%- assign link_image = link_item.image.src | collection_img_url: '1024x1024' -%}
+    {% else %}
+      {%- assign link_image = link_item.products.first.featured_image | product_img_url: '1024x1024' -%}
+    {% endif %}
+  {% elsif link.type == 'product_link' %}
+    {%- assign link_image = link_item.featured_image | product_img_url: '1024x1024' -%}
+  {% elsif link.type == 'page_link' %}
+    {% if link_item.content contains "<img" %}
+      {%- assign src = link_item.content | split: 'src="' -%}
+      {%- assign src = src[1] | split: '"' | first -%}
+
+      {% if src %}
+        {%- assign link_image = src -%}
+      {% endif %}
+    {% endif %}
+  {% elsif link.type == 'blog_link' %}
+    {% if link_item.articles.first.image %}
+      {%- assign link_image = link_item.articles.first.image | img_url: '1024x1024' -%}
+    {% elsif link_item.articles.first.content contains "<img" %}
+      {%- assign src = link_item.articles.first.content | split: 'src="' -%}
+      {%- assign src = src[1] | split: '"' | first -%}
+
+      {% if src %}
+        {%- assign link_image = src -%}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+
+  <div class="{% render 'column-width', value: collections_per_row %} column {% if settings.mobile_products_per_row == '1' %}medium-down--one-whole{% else %}medium-down--one-half{% endif %} thumbnail">
+    <a href="{{ link.url }}" title="{{ link_title }}" class="thumbnail__link">
+      {% if link_image != '' %}
+        <img src="{{ link_image }}" class="lazyload" alt="{{ link_title }}" />
+      {% endif %}
+
+      <div class="thumbnail__content thumbnail__content--{{ settings.collection_price_position }}">
+        <span class="thumbnail__title">
+          {{ link_title }}
+        </span>
+      </div>
+    </a>
+  </div>
+{% endfor %}
